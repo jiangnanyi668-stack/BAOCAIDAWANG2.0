@@ -5,30 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>简历全流程优化助手</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.min.js"></script>
 <script>
 tailwind.config = {
   theme: {
     extend: {
       colors: {
-        base: '#F9F3E6',
-        pink: '#F8A9C7',
-        cat1: '#FFE5D9',
-        cat2: '#E5F8D9',
-        cat3: '#D9F0FF',
-        cat4: '#FFE0F1',
-        mbti_sj: '#E0EBFF',
-        mbti_sp: '#FFF5E0',
-        mbti_nf: '#E0FFE8',
-        mbti_nt: '#F3E0FF',
-        industry_it: '#E0FBFF',
-        industry_fin: '#FFE0F3',
-        industry_office: '#F0FFE0',
-        industry_edu: '#FFE5E0',
-        industry_market: '#FFE0F9',
-        industry_biz: '#E0FFFB',
-        industry_art: '#FFE0F5',
-        industry_service: '#F5FFE0'
+        base: '#F9F3E6', pink: '#F8A9C7',
+        cat1: '#FFE5D9', cat2: '#E5F8D9', cat3: '#D9F0FF', cat4: '#FFE0F1'
       },
       borderRadius: { 'soft': '16px' }
     }
@@ -475,10 +459,10 @@ tailwind.config = {
 
 <script>
 // ==========================
-// ✅ 已修复：国内稳定、无跨域、免费AI代理
+// ✅ 你的 GROQCLOUD API 已填好
 // ==========================
-const AI_API_URL = "https://openrouter-proxy.vercel.app/api/v1/chat/completions";
-const AI_API_KEY = "sk-or-v1-7e625d887a3ee4a44e17b2ca74e98d1f31e1d6c889959779c2a3e2d159a9ea9";
+const AI_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const AI_API_KEY = "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";
 
 let selectedStyle = "应届生";
 let polishType = 1;
@@ -497,7 +481,7 @@ function switchTab(num) {
 }
 
 // ==========================
-// 模块1：专业分类折叠
+// 专业分类折叠
 // ==========================
 function toggleMajorCat(id) {
   const el = document.getElementById(id);
@@ -517,7 +501,7 @@ document.querySelectorAll('.major-btn').forEach(btn=>{
 })
 
 // ==========================
-// 模块1 原有功能
+// 选择按钮
 // ==========================
 const eduBtns = document.querySelectorAll("#eduLevel button");
 eduBtns.forEach(btn => {
@@ -591,7 +575,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       method:"POST",
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:"你是专业简历助手，简洁专业、分点清晰、无语病空话、无特殊符号"},
           {role:"user",content:`
@@ -629,7 +613,7 @@ async function hrEvaluate(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:"你是资深HR，先分点列出修改方向，再给整体评价，专业简洁"},
           {role:"user",content:"请评价这份简历："+t}
@@ -642,7 +626,7 @@ async function hrEvaluate(){
 }
 
 // ==========================
-// 模块3：简历生成优化
+// 模块3：简历优化
 // ==========================
 function selectStyle(s){selectedStyle=s;
   document.querySelectorAll('.style-btn').forEach(b=>{b.classList.remove('bg-pink','text-white');b.classList.add('bg-gray-200');});
@@ -659,7 +643,7 @@ async function optimizeResume(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:`你是专业简历优化师，按${selectedStyle}风格优化，JD关键词、避雷空话、分点清晰、简洁专业`},
           {role:"user",content:`简历框架：${b}，修改建议：${d}`}
@@ -679,7 +663,7 @@ async function translateResume(){
   const r=await fetch(AI_API_URL,{
     method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
     body:JSON.stringify({
-      model:"qwen/qwen-2-7b-instruct:free",
+      model:"llama3-8b-8192",
       messages:[
         {role:"system",content:"将简历翻译成地道、专业的英文，保持结构分点，不改变格式"},
         {role:"user",content:t}
@@ -717,7 +701,7 @@ async function polishExperience(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:"你是简历润色师，职场化、成果化、分点清晰、无语病空话"},
           {role:"user",content:p}
@@ -730,7 +714,7 @@ async function polishExperience(){
 }
 
 // ==========================
-// 模块5：AI面试模拟
+// 模块5：AI面试
 // ==========================
 let interviewLang = "zh";
 let currentQuestions = [];
@@ -764,7 +748,7 @@ async function startInterview(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:prompt},
           {role:"user",content:"简历："+resume+"，请开始面试，出第一题"}
@@ -804,7 +788,7 @@ async function submitAnswer(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[
           {role:"system",content:prompt},
           {role:"user",content:"问题："+currentQuestions[qIndex]+"，回答："+ans}
@@ -824,7 +808,7 @@ async function nextQuestion(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[{role:"system",content:"继续面试，出下一题"},{role:"user",content:"下一题"}]
       })
     });
@@ -845,7 +829,7 @@ async function randomQuestions(){
     const r=await fetch(AI_API_URL,{
       method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
       body:JSON.stringify({
-        model:"qwen/qwen-2-7b-instruct:free",
+        model:"llama3-8b-8192",
         messages:[{role:"user",content:`出1道${industry}行业${job}岗位的高频面试题`}]
       })
     });
@@ -867,7 +851,7 @@ function exportPDF(){
 }
 
 // ==========================
-// 通用复制
+// 复制
 // ==========================
 function copyText(id){
   const t=document.getElementById(id).innerText;
