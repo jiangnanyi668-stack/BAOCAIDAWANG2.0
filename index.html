@@ -458,7 +458,7 @@ tailwind.config = {
 </div>
 
 <script>
-const AI_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const AI_API_URL = "https://api.allorigins.win/https://api.groq.com/openai/v1/chat/completions";
 const AI_API_KEY = "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";
 let selectedStyle = "应届生";
 let polishType = 1;
@@ -759,4 +759,135 @@ async function startInterview(){
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
+      body:JSON.stringify({
+        model:"gemma2-9b-it",
+        messages:[
+          {role:"system",content:prompt},
+          {role:"user",content:"简历："+resume+"，请开始面试，出第一题"}
+        ]
+      })
+    });
+    const d=await r.json();
+    const q = d.choices?.[0]?.message.content;
+    document.getElementById("loadingTip").classList.add("hidden");
+    addChat("面试官",q);
+    currentQuestions=[q];
+  }catch(e){alert("网络错误，请重试")}
+}
+
+function addChat(role,text){
+  const c=document.getElementById("interviewChat");
+  const div=document.createElement("div");
+  div.className="mb-2";
+  div.innerHTML=`<span class="font-bold ${role=='面试官'?'text-pink':'text-blue-600'}">${role}：</span>${text}`;
+  c.appendChild(div);
+  chatHistory += role + "：" + text + "\n";
+}
+
+async function submitAnswer(){
+  const ans=document.getElementById("userAnswer").value.trim();
+  if(!ans)return alert("请输入回答");
+  addChat("我",ans);
+  document.getElementById("userAnswer").value="";
+  document.getElementById("feedbackArea").classList.remove("hidden");
+  document.getElementById("feedbackContent").innerText="分析回答中...";
+
+  const prompt=interviewLang=="zh"
+  ?`对面试回答进行点评：1.亮点 2.漏洞 3.优化回答 4.得分（逻辑/专业/表达/匹配度）`
+  :`Analyze answer: 1.Strength 2.Weakness 3.Optimized answer 4.Score`;
+  
+  try{
+    const controller = new AbortController();
+    const r=await fetch(AI_API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
+      body:JSON.stringify({
+        model:"gemma2-9b-it",
+        messages:[
+          {role:"system",content:prompt},
+          {role:"user",content:"问题："+currentQuestions[qIndex]+"，回答："+ans}
+        ]
+      })
+    });
+    const d=await r.json();
+    document.getElementById("feedbackContent").innerText=d.choices?.[0]?.message.content;
+  }catch(e){document.getElementById("feedbackContent").innerText="错误，请重试"}
+}
+
+async function nextQuestion(){
+  qIndex++;
+  document.getElementById("feedbackContent").innerText="";
+  document.getElementById("loadingTip").classList.remove("hidden");
+  try{
+    const controller = new AbortController();
+    const r=await fetch(AI_API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
+      body:JSON.stringify({
+        model:"gemma2-9b-it",
+        messages:[{role:"system",content:"继续面试，出下一题"},{role:"user",content:"下一题"}]
+      })
+    });
+    const d=await r.json();
+    const q=d.choices?.[0]?.message.content;
+    document.getElementById("loadingTip").classList.add("hidden");
+    addChat("面试官",q);
+    currentQuestions.push(q);
+  }catch(e){alert("网络错误，请重试")}
+}
+
+async function randomQuestions(){
+  const industry=document.getElementById("interviewIndustry").value;
+  const job=document.getElementById("interviewJob").value;
+  document.getElementById("interviewBox").classList.remove("hidden");
+  document.getElementById("answerArea").classList.remove("hidden");
+  try{
+    const controller = new AbortController();
+    const r=await fetch(AI_API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
+      body:JSON.stringify({
+        model:"gemma2-9b-it",
+        messages:[{role:"user",content:`出1道${industry}行业${job}岗位的高频面试题`}]
+      })
+    });
+    const d=await r.json();
+    addChat("面试官",d.choices?.[0]?.message.content);
+  }catch(e){alert("网络错误，请重试")}
+}
+
+function copyInterview(){
+  navigator.clipboard.writeText(chatHistory);
+  alert("已复制面试全程");
+}
+
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text(chatHistory,10,10);
+  doc.save("面试复盘.pdf");
+}
+
+function copyText(id){
+  const t=document.getElementById(id).innerText;
+  navigator.clipboard.writeText(t);
+  alert("已复制");
+}
+</script>
+</body>
+</html>
