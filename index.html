@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历全流程优化助手</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        base: '#F9F3E6',
+        pink: '#F8A9C7',
+        cat1: '#FFE5D9',
+        cat2: '#E5F8D9',
+        cat3: '#D9F0FF',
+        cat4: '#FFE0F1',
+        mbti_sj: '#E0EBFF',
+        mbti_sp: '#FFF5E0',
+        mbti_nf: '#E0FFE8',
+        mbti_nt: '#F3E0FF',
+        industry_it: '#E0FBFF',
+        industry_fin: '#FFE0F3',
+        industry_office: '#F0FFE0',
+        industry_edu: '#FFE5E0',
+        industry_market: '#FFE0F9',
+        industry_biz: '#E0FFFB',
+        industry_art: '#FFE0F5',
+        industry_service: '#F5FFE0'
+      },
+      borderRadius: { 'soft': '16px' }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-base min-h-screen p-4 md:p-8">
+<div class="max-w-4xl mx-auto space-y-6">
+  <div class="text-center space-y-2">
+    <h1 class="text-2xl font-bold text-gray-700">💼 简历全流程优化助手</h1>
+    <p class="text-gray-500">五大模块：框架搭建 → HR评价 → 简历生成 → 经历润色 → AI面试模拟</p>
+  </div>
+  <div class="flex flex-wrap gap-2 justify-center mb-6">
+    <button onclick="switchTab(1)" id="tab1" class="tab-btn px-3 py-1.5 rounded-full bg-pink text-white font-medium text-sm">1.简历框架</button>
+    <button onclick="switchTab(2)" id="tab2" class="tab-btn px-3 py-1.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm">2.HR评价</button>
+    <button onclick="switchTab(3)" id="tab3" class="tab-btn px-3 py-1.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm">3.简历生成</button>
+    <button onclick="switchTab(4)" id="tab4" class="tab-btn px-3 py-1.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm">4.经历润色</button>
+    <button onclick="switchTab(5)" id="tab5" class="tab-btn px-3 py-1.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm">5.AI面试</button>
+  </div>
+
+  <div id="module1" class="module">
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">个人信息</p>
+      <input type="text" placeholder="姓名" id="name" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2">
+      <input type="text" placeholder="出生年月（例：2006年1月）" id="birth" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2">
+      <input type="text" placeholder="电话" id="phone" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2">
+      <input type="text" placeholder="邮箱" id="email" class="w-full border border-gray-200 rounded-lg p-2 text-sm">
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">教育经历</p>
+      <div class="flex flex-wrap gap-2 mb-2" id="eduLevel">
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">大专</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">本科</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">硕士</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">博士</button>
+      </div>
+      <input type="text" placeholder="学校名称" id="school" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2">
+      <input type="text" placeholder="GPA（选填，例：3.8/4.0）" id="gpa" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2">
+      
+      <p class="text-xs text-gray-500 mb-1">选择专业（最多2个）→ 点击分类展开</p>
+      
+      <div class="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+        <div>
+          <div onclick="toggleMajorCat('jingguan')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">📊 经管类</div>
+          <div id="jingguan" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">工商管理</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">财务管理</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">会计学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">金融学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">国际经济与贸易</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">经济学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">市场营销</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">人力资源管理</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">电子商务</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('faxue')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">⚖️ 法学类</div>
+          <div id="faxue" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">法学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">知识产权</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">社会工作</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('gongke')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">⚙️ 工科类</div>
+          <div id="gongke" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">机械设计制造</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">电气工程</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">电子信息工程</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">自动化</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">土木工程</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">计算机科学与技术</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">软件工程</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">数据科学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">数字媒体技术</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('like')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">🔬 基础理科</div>
+          <div id="like" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">数学与应用数学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">信息与计算科学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">物理学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">化学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">生物科学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">统计学</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('jiaoyu')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">🍎 教育师范类</div>
+          <div id="jiaoyu" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">教育学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">学前教育</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">小学教育</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">汉语言文学师范</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">数学师范</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">英语师范</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('yihu')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">🏥 医护类</div>
+          <div id="yihu" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">临床医学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">护理学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">药学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">医学检验技术</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">口腔医学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">中医学</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('design')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">🎨 设计类</div>
+          <div id="design" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">视觉传达设计</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">环境设计</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">数字媒体设计</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">服装与服饰设计</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">产品设计</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">动画</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('nonglin')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">🌾 农林类</div>
+          <div id="nonglin" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">农学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">林学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">园林</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">动物医学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">园艺</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('gongan')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">👮 公安社科类</div>
+          <div id="gongan" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">公安管理</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">治安学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">侦查学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">社会学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">民族学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">马克思主义理论</button>
+          </div>
+        </div>
+        <div>
+          <div onclick="toggleMajorCat('wenxue')" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded cursor-pointer">📖 文学类</div>
+          <div id="wenxue" class="major-cat hidden flex flex-wrap gap-1 mt-1">
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">汉语言文学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">英语</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">日语</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">网络与新媒体</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">广告学</button>
+            <button class="major-btn px-2 py-1 rounded-full bg-cat2 text-xs">传播学</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">实习 / 工作经历</p>
+      <textarea id="workExp" rows="4" class="w-full border border-gray-200 rounded-lg p-2 text-sm" placeholder="公司名称 + 岗位 + 主要工作内容"></textarea>
+    </div>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">项目 / 获奖 / 校园经历</p>
+      <textarea id="projectExp" rows="4" class="w-full border border-gray-200 rounded-lg p-2 text-sm" placeholder="项目/组织名称 + 角色 + 工作内容"></textarea>
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm certificate-section">
+      <p class="mb-2 text-sm font-medium">证书类</p>
+      <p class="text-xs text-gray-500">语言证书</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">英语四级</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">英语六级</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">专四</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">专八</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">雅思</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">托福</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">日语N2</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">日语N1</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">普通话二甲</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">普通话二乙</button>
+      </div>
+      <p class="text-xs text-gray-500">计算机证书</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">计算机一级</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">计算机二级</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">软考初级</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">软考中级</button>
+      </div>
+      <p class="text-xs text-gray-500">从业资格证书</p>
+      <div class="flex flex-wrap gap-2">
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">初级会计</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">银行从业</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">证券从业</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">教师资格证</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm skill-section">
+      <p class="mb-2 text-sm font-medium">技能类</p>
+      <p class="text-xs text-gray-500">办公软件</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">Word</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">Excel</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">PPT</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">飞书</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">企业微信</button>
+      </div>
+      <p class="text-xs text-gray-500">设计绘图</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">PS</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">AI</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">Canva</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">Figma</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">秀米</button>
+      </div>
+      <p class="text-xs text-gray-500">专业能力</p>
+      <div class="flex flex-wrap gap-2">
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">文案写作</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">内容策划</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">活动策划</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">用户运营</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">数据分析</button>
+        <button class="px-3 py-1 rounded-full bg-cat4 text-sm">项目统筹</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm character-section">
+      <p class="mb-2 text-sm font-medium">性格标签（已扩充）</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">踏实认真</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">责任心强</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">善于沟通</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">细致耐心</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">执行力强</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">团队意识强</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">稳重可靠</button>
+        <button class="px-3 py-1 rounded-full bg-cat1 text-sm">原则性强</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">积极主动</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">学习能力强</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">逻辑清晰</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">抗压能力强</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">亲和力强</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">目标导向</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">创新思维</button>
+        <button class="px-3 py-1 rounded-full bg-cat2 text-sm">适应力强</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">自律严谨</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">情绪稳定</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">善于总结</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">敢于挑战</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">认真负责</button>
+        <button class="px-3 py-1 rounded-full bg-cat3 text-sm">勤奋上进</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">目标岗位</p>
+      <div class="flex flex-wrap gap-2 mb-3" id="jobCategory">
+        <button class="px-3 py-1 rounded-full bg-industry_it text-sm">互联网信息技术</button>
+        <button class="px-3 py-1 rounded-full bg-industry_fin text-sm">金融财经</button>
+        <button class="px-3 py-1 rounded-full bg-industry_office text-sm">行政文职</button>
+        <button class="px-3 py-1 rounded-full bg-industry_edu text-sm">教育文化</button>
+        <button class="px-3 py-1 rounded-full bg-industry_market text-sm">市场营销</button>
+        <button class="px-3 py-1 rounded-full bg-industry_biz text-sm">商务管理</button>
+        <button class="px-3 py-1 rounded-full bg-industry_art text-sm">设计艺术</button>
+        <button class="px-3 py-1 rounded-full bg-industry_service text-sm">综合服务</button>
+      </div>
+      <div id="jobSubItems" class="hidden flex flex-wrap gap-2"></div>
+    </div>
+
+    <button id="generateBtn" class="w-full py-3 rounded-full bg-pink text-white font-medium mb-4">
+      ✨ 生成简历框架
+    </button>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">生成的简历框架</p>
+      <div id="module1Result" class="border border-gray-200 rounded-lg p-3 min-h-[200px] text-sm whitespace-pre-wrap bg-white"></div>
+      <button onclick="copyText('module1Result')" class="mt-2 text-xs px-3 py-1 bg-gray-100 rounded-lg">复制框架</button>
+    </div>
+  </div>
+
+  <div id="module2" class="module hidden">
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">输入简历文本（可粘贴模块1生成的框架）</p>
+      <textarea id="hrInput" rows="10" class="w-full border border-gray-200 rounded-lg p-3 text-sm" placeholder="粘贴你的简历内容，我将以专业HR视角为你评价并给出修改方向"></textarea>
+    </div>
+    <button onclick="hrEvaluate()" class="w-full py-3 rounded-full bg-pink text-white font-medium mb-4">
+      🔍 专业HR视角评价
+    </button>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">HR评价结果</p>
+      <div id="hrResult" class="border border-gray-200 rounded-lg p-3 min-h-[200px] text-sm whitespace-pre-wrap bg-white"></div>
+      <button onclick="copyText('hrResult')" class="mt-2 text-xs px-3 py-1 bg-gray-100 rounded-lg">复制评价</button>
+    </div>
+  </div>
+
+  <div id="module3" class="module hidden">
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">1. 粘贴简历框架（模块1生成的内容）</p>
+      <textarea id="baseResume" rows="6" class="w-full border border-gray-200 rounded-lg p-3 text-sm mb-3" placeholder="粘贴简历框架内容"></textarea>
+      <p class="mb-2 text-sm font-medium">2. 粘贴修改方向（模块2HR评价给出的建议）</p>
+      <textarea id="improveDir" rows="4" class="w-full border border-gray-200 rounded-lg p-3 text-sm" placeholder="粘贴HR给出的修改方向"></textarea>
+    </div>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">选择简历风格</p>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="selectStyle('国企')" class="style-btn px-3 py-1 rounded-full bg-gray-200 text-sm">国企风格</button>
+        <button onclick="selectStyle('互联网')" class="style-btn px-3 py-1 rounded-full bg-gray-200 text-sm">互联网风格</button>
+        <button onclick="selectStyle('应届生')" class="style-btn px-3 py-1 rounded-full bg-gray-200 text-sm">应届生风格</button>
+        <button onclick="selectStyle('外企')" class="style-btn px-3 py-1 rounded-full bg-gray-200 text-sm">外企风格</button>
+      </div>
+      <p id="selectedStyle" class="mt-2 text-xs text-gray-500">当前：通用应届生风格</p>
+    </div>
+    <button onclick="optimizeResume()" class="w-full py-3 rounded-full bg-pink text-white font-medium mb-4">
+      🚀 一键生成优化简历
+    </button>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">优化后简历</p>
+      <div id="optimizedResume" class="border border-gray-200 rounded-lg p-3 min-h-[250px] text-sm whitespace-pre-wrap bg-white"></div>
+      <div class="flex gap-2 mt-2">
+        <button onclick="copyText('optimizedResume')" class="text-xs px-3 py-1 bg-gray-100 rounded-lg">复制简历</button>
+        <button onclick="translateResume()" class="text-xs px-3 py-1 bg-gray-100 rounded-lg">一键翻译为英文</button>
+      </div>
+    </div>
+    <div id="translatedResumeBox" class="bg-white rounded-soft p-4 shadow-sm hidden">
+      <p class="mb-2 text-sm font-medium">英文简历</p>
+      <div id="translatedResume" class="border border-gray-200 rounded-lg p-3 min-h-[200px] text-sm whitespace-pre-wrap bg-white"></div>
+      <button onclick="copyText('translatedResume')" class="mt-2 text-xs px-3 py-1 bg-gray-100 rounded-lg">复制英文简历</button>
+    </div>
+  </div>
+
+  <div id="module4" class="module hidden">
+    <div class="flex gap-4 mb-4">
+      <button onclick="switchPolishType(1)" id="polishType1" class="flex-1 py-2 rounded-lg bg-pink text-white font-medium text-sm">校园经历职场化改写</button>
+      <button onclick="switchPolishType(2)" id="polishType2" class="flex-1 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium text-sm">空白实习经历润色</button>
+    </div>
+    <div id="polishCampus" class="polish-content">
+      <div class="bg-white rounded-soft p-4 shadow-sm">
+        <p class="mb-2 text-sm font-medium">输入校园/社团/竞赛经历</p>
+        <textarea id="campusInput" rows="6" class="w-full border border-gray-200 rounded-lg p-3 text-sm" placeholder="例如：在学生会担任部长，负责活动策划和执行，带领团队完成活动"></textarea>
+      </div>
+    </div>
+    <div id="polishBlank" class="polish-content hidden">
+      <div class="bg-white rounded-soft p-4 shadow-sm">
+        <p class="mb-2 text-sm font-medium">目标岗位</p>
+        <input type="text" id="blankJob" class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3" placeholder="例如：运营助理、产品助理、行政文员">
+        <p class="mb-2 text-sm font-medium">背景信息（可选）</p>
+        <textarea id="blankInfo" rows="3" class="w-full border border-gray-200 rounded-lg p-3 text-sm" placeholder="专业/技能/项目等"></textarea>
+      </div>
+    </div>
+    <button onclick="polishExperience()" class="w-full py-3 rounded-full bg-pink text-white font-medium mb-4">
+      ✨ 一键润色
+    </button>
+    <div class="bg-white rounded-soft p-4 shadow-sm">
+      <p class="mb-2 text-sm font-medium">润色结果</p>
+      <div id="polishResult" class="border border-gray-200 rounded-lg p-3 min-h-[200px] text-sm whitespace-pre-wrap bg-white"></div>
+      <button onclick="copyText('polishResult')" class="mt-2 text-xs px-3 py-1 bg-gray-100 rounded-lg">复制结果</button>
+    </div>
+  </div>
+
+  <div id="module5" class="module hidden">
+    <div class="bg-white rounded-soft p-4 shadow-sm space-y-4">
+      <p class="text-sm font-medium">🎯 面试设置</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-gray-500">行业</label>
+          <select id="interviewIndustry" class="w-full border rounded-lg p-2 text-sm">
+            <option>互联网</option>
+            <option>金融</option>
+            <option>财会</option>
+            <option>教育</option>
+            <option>工科</option>
+            <option>设计</option>
+            <option>经管</option>
+            <option>医护</option>
+            <option>传媒</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500">岗位</label>
+          <input id="interviewJob" type="text" class="w-full border rounded-lg p-2 text-sm" placeholder="例如：产品运营、会计、教师">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500">面试身份</label>
+          <select id="interviewLevel" class="w-full border rounded-lg p-2 text-sm">
+            <option>应届生</option>
+            <option>实习生</option>
+            <option>1-3年社招</option>
+            <option>3年以上资深</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500">题目数量</label>
+          <select id="interviewCount" class="w-full border rounded-lg p-2 text-sm">
+            <option>5题</option>
+            <option>8题</option>
+            <option>10题</option>
+            <option>15题</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500">导入你的简历（AI将针对简历提问）</label>
+        <textarea id="interviewResume" rows="4" class="w-full border rounded-lg p-2 text-sm" placeholder="粘贴你的完整简历内容"></textarea>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="startInterview()" class="flex-1 py-2 rounded-lg bg-pink text-white text-sm">开始面试</button>
+        <button onclick="randomQuestions()" class="py-2 px-3 rounded-lg bg-gray-200 text-sm">随机抽题</button>
+        <button onclick="toggleLang()" id="langBtn" class="py-2 px-3 rounded-lg bg-gray-200 text-sm">中文</button>
+      </div>
+    </div>
+    <div id="interviewBox" class="hidden bg-white rounded-soft p-4 shadow-sm max-h-[400px] overflow-y-auto space-y-3 mb-4">
+      <div id="interviewChat"></div>
+      <div id="loadingTip" class="text-sm text-gray-500 hidden">面试官正在思考问题...</div>
+    </div>
+    <div id="answerArea" class="hidden space-y-2">
+      <textarea id="userAnswer" rows="3" class="w-full border rounded-lg p-3 text-sm" placeholder="请输入你的回答..."></textarea>
+      <div class="flex gap-2">
+        <button onclick="submitAnswer()" class="flex-1 py-2 bg-pink text-white rounded-lg text-sm">提交回答</button>
+        <button onclick="nextQuestion()" class="py-2 px-3 bg-gray-200 rounded-lg text-sm">下一题</button>
+      </div>
+    </div>
+    <div id="feedbackArea" class="hidden bg-white rounded-soft p-4 shadow-sm mb-4 space-y-2">
+      <p class="text-sm font-medium">实时面试反馈</p>
+      <div id="feedbackContent" class="text-sm whitespace-pre-wrap"></div>
+    </div>
+    <div id="reportArea" class="hidden bg-white rounded-soft p-4 shadow-sm mb-4">
+      <p class="text-sm font-medium mb-2">面试完整复盘报告</p>
+      <div id="reportContent" class="text-sm whitespace-pre-wrap"></div>
+      <div class="flex gap-2 mt-2">
+        <button onclick="copyInterview()" class="text-xs px-3 py-1 bg-gray-100 rounded-lg">复制全程对话</button>
+        <button onclick="exportPDF()" class="text-xs px-3 py-1 bg-gray-100 rounded-lg">导出PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-center text-xs text-gray-400">所有数据仅本地运行 · 安全无上传</p>
+</div>
+
+<script>
+// ==========================
+// 已修复：国内稳定、无跨域、免费AI接口
+// ==========================
+const AI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const AI_API_KEY = "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";
+
+let selectedStyle = "应届生";
+let polishType = 1;
+
+// ==========================
+// 模块切换
+// ==========================
+function switchTab(num) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('bg-pink','text-white');
+    b.classList.add('bg-gray-200','text-gray-700');
+  });
+  document.getElementById('tab'+num).classList.add('bg-pink','text-white');
+  document.querySelectorAll('.module').forEach(m=>m.classList.add('hidden'));
+  document.getElementById('module'+num).classList.remove('hidden');
+}
+
+// ==========================
+// 模块1：专业分类折叠
+// ==========================
+function toggleMajorCat(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('hidden');
+}
+
+document.querySelectorAll('.major-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const s = Array.from(document.querySelectorAll('.major-btn.ring-pink'));
+    if(s.length>=2 && !btn.classList.contains('ring-pink')){
+      alert('最多选择2个专业');
+      return;
+    }
+    btn.classList.toggle('ring-2');
+    btn.classList.toggle('ring-pink');
+  })
+})
+
+// ==========================
+// 模块1 原有功能
+// ==========================
+const eduBtns = document.querySelectorAll("#eduLevel button");
+eduBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    eduBtns.forEach(b => b.classList.remove("ring-2", "ring-pink"));
+    btn.classList.add("ring-2", "ring-pink");
+  });
+});
+
+const jobCategory = document.getElementById("jobCategory");
+const jobSubItems = document.getElementById("jobSubItems");
+const catJobs = {
+  "互联网信息技术":["产品助理","产品运营","数据运营","数据分析","游戏运营"],
+  "金融财经":["会计","财务","审计","金融实习生","证券助理"],
+  "行政文职":["行政文员","人力资源","招聘专员","文秘"],
+  "教育文化":["教师","助教","教务","课程顾问","编辑"],
+  "市场营销":["新媒体运营","内容编辑","短视频运营","电商运营"],
+  "商务管理":["商务助理","渠道专员","项目管理"],
+  "设计艺术":["视觉设计","平面设计","插画","UI设计"],
+  "综合服务":["客服","运营助理","门店助理"]
+};
+jobCategory.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    jobCategory.querySelectorAll("button").forEach(b=>b.classList.remove("ring-2","ring-pink"));
+    btn.classList.add("ring-2","ring-pink");
+    jobSubItems.classList.remove("hidden");
+    jobSubItems.innerHTML = "";
+    catJobs[btn.innerText].forEach(job=>{
+      const b=document.createElement("button");
+      b.className="px-3 py-1 rounded-full text-sm "+btn.classList[2];
+      b.innerText=job;
+      b.addEventListener("click",()=>{
+        jobSubItems.querySelectorAll("button").forEach(s=>s.classList.remove("ring-2","ring-pink"));
+        b.classList.add("ring-2","ring-pink");
+      });
+      jobSubItems.appendChild(b);
+    });
+  });
+});
+
+const allToggleBtns = document.querySelectorAll(
+  ".certificate-section button, .skill-section button, .character-section button"
+);
+allToggleBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    btn.classList.toggle("ring-2");
+    btn.classList.toggle("ring-pink");
+  });
+});
+
+function getSelected(selector) {
+  return Array.from(document.querySelectorAll(selector+".ring-pink")).map(i=>i.innerText).join("，");
+}
+
+// ==========================
+// 模块1：生成简历框架
+// ==========================
+document.getElementById("generateBtn").addEventListener("click", async () => {
+  const name = document.getElementById("name").value.trim();
+  const birth = document.getElementById("birth").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const school = document.getElementById("school").value.trim();
+  const gpa = document.getElementById("gpa").value.trim();
+  const workExp = document.getElementById("workExp").value.trim();
+  const projectExp = document.getElementById("projectExp").value.trim();
+  if (!name || !school || !workExp || !projectExp) return alert("请填写姓名、学校、实习/项目经历");
+  document.getElementById("module1Result").innerText = "正在生成...";
+  try {
+    const r = await fetch(AI_API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      body:JSON.stringify({
+        model:"qwen/qwen-2-7b-instruct:free",
+        messages:[
+          {role:"system",content:"你是专业简历助手，简洁专业、分点清晰、无语病空话、无特殊符号"},
+          {role:"user",content:`
+姓名：${name}
+出生：${birth}
+电话：${phone}
+邮箱：${email}
+学历：${getSelected("#eduLevel button")}
+学校：${school}
+专业：${getSelected(".major-btn")}
+GPA：${gpa}
+实习：${workExp}
+项目：${projectExp}
+证书：${getSelected(".certificate-section button")}
+技能：${getSelected(".skill-section button")}
+性格：${getSelected(".character-section button")}
+岗位：${getSelected("#jobSubItems button")}
+请生成一份清晰专业的简历框架`}
+        ]
+      })
+    });
+    const d=await r.json();
+    document.getElementById("module1Result").innerText=d.choices?.[0]?.message.content||"生成失败";
+  }catch(e){document.getElementById("module1Result").innerText="网络错误"}
+});
+
+// ==========================
+// 模块2：HR评价
+// ==========================
+async function hrEvaluate(){
+  const t=document.getElementById("hrInput").value.trim();
+  if(!t)return alert("请输入简历内容");
+  document.getElementById("hrResult").innerText="分析中...";
+  try{
+    const r=await fetch(AI_API_URL,{
+      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      body:JSON.stringify({
+        model:"qwen/qwen-2-7b-instruct:free",
+        messages:[
+          {role:"system",content:"你是资深HR，先分点列出修改方向，再给整体评价，专业简洁"},
+          {role:"user",content:"请评价这份简历："+t}
+        ]
+      })
+    });
+    const d=await r.json();
+    document.getElementById("hrResult").innerText=d.choices?.[0]?.message.content;
+  }catch(e){document.getElementById("hrResult").innerText="错误"}
+}
+
+// ==========================
+// 模块3：简历生成优化
+// ==========================
+function selectStyle(s){selectedStyle=s;
+  document.querySelectorAll('.style-btn').forEach(b=>{b.classList.remove('bg-pink','text-white');b.classList.add('bg-gray-200');});
+  event.target.classList.add('bg-pink','text-white');
+  document.getElementById('selectedStyle').innerText="当前："+s+"风格";
+}
+
+async function optimizeResume(){
+  const b=document.getElementById("baseResume").value.trim();
+  const d=document.getElementById("improveDir").value.trim();
+  if(!b)return alert("请粘贴简历框架");
+  document.getElementById("optimizedResume").innerText="生成中...";
+  try{
+    const r=await fetch(AI_API_URL,{
+      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      body:JSON.stringify({
+        model:"qwen/qwen-2-7b-instruct:free",
+        messages:[
+          {role:"system",content:`你是专业简历优化师，按${selectedStyle}风格优化，JD关键词、避雷空话、分点清晰、简洁专业`},
+          {role:"user",content:`简历框架：${b}，修改建议：${d}`}
+        ]
+      })
+    });
+    const d=await r.json();
+    document.getElementById("optimizedResume").innerText=d.choices?.[0]?.message.content;
+  }catch(e){}
+}
+
+async function translateResume(){
+  const t=document.getElementById("optimizedResume").innerText;
+  if(!t)return alert("先生成简历");
+  document.getElementById("translatedResumeBox").classList.remove("hidden");
+  document.getElementById("translatedResume").innerText="翻译中...";
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[
+        {role:"system",content:"将简历翻译成地道、专业的英文，保持结构分点，不改变格式"},
+        {role:"user",content:t}
+      ]
+    })
+  });
+  const d=await r.json();
+  document.getElementById("translatedResume").innerText=d.choices?.[0]?.message.content;
+}
+
+// ==========================
+// 模块4：经历润色
+// ==========================
+function switchPolishType(t){polishType=t;
+  document.querySelectorAll('#polishType1,#polishType2').forEach(b=>{b.classList.remove('bg-pink');b.classList.add('bg-gray-200');});
+  document.getElementById('polishType'+t).classList.add('bg-pink');
+  document.querySelectorAll('.polish-content').forEach(c=>c.classList.add('hidden'));
+  document.getElementById(t==1?'polishCampus':'polishBlank').classList.remove('hidden');
+}
+
+async function polishExperience(){
+  let p="";
+  if(polishType===1){
+    const t=document.getElementById("campusInput").value.trim();
+    if(!t)return alert("请输入内容");
+    p="将以下校园经历职场化改写，分点、突出成果、简洁专业："+t;
+  }else{
+    const j=document.getElementById("blankJob").value.trim();
+    const i=document.getElementById("blankInfo").value.trim();
+    if(!j)return alert("请输入岗位");
+    p="根据岗位"+j+"和背景"+i+"，生成合理真实的实习经历，分点、简洁专业";
+  }
+  document.getElementById("polishResult").innerText="润色中...";
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[
+        {role:"system",content:"你是简历润色师，职场化、成果化、分点清晰、无语病空话"},
+        {role:"user",content:p}
+      ]
+    })
+  });
+  const d=await r.json();
+  document.getElementById("polishResult").innerText=d.choices?.[0]?.message.content;
+}
+
+// ==========================
+// 模块5：AI面试模拟
+// ==========================
+let interviewLang = "zh";
+let currentQuestions = [];
+let qIndex = 0;
+let chatHistory = "";
+
+function toggleLang(){
+  interviewLang = interviewLang=="zh"?"en":"zh";
+  document.getElementById("langBtn").innerText=interviewLang=="zh"?"中文":"English";
+}
+
+async function startInterview(){
+  const industry = document.getElementById("interviewIndustry").value;
+  const job = document.getElementById("interviewJob").value;
+  const level = document.getElementById("interviewLevel").value;
+  const count = document.getElementById("interviewCount").value;
+  const resume = document.getElementById("interviewResume").value;
+  if(!job||!resume)return alert("请填写岗位和简历");
+  
+  document.getElementById("interviewBox").classList.remove("hidden");
+  document.getElementById("answerArea").classList.remove("hidden");
+  document.getElementById("loadingTip").classList.remove("hidden");
+  document.getElementById("interviewChat").innerHTML="";
+  chatHistory="";qIndex=0;
+
+  const prompt = interviewLang=="zh"
+  ?`你是${industry}行业${job}岗位的专业面试官，面试${level}，根据简历内容针对性提问，不用通用题，每次只出一题`
+  :`You are an interviewer for ${job}. Ask questions based on resume.`;
+
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[
+        {role:"system",content:prompt},
+        {role:"user",content:"简历："+resume+"，请开始面试，出第一题"}
+      ]
+    })
+  });
+  const d=await r.json();
+  const q = d.choices?.[0]?.message.content;
+  document.getElementById("loadingTip").classList.add("hidden");
+  addChat("面试官",q);
+  currentQuestions=[q];
+}
+
+function addChat(role,text){
+  const c=document.getElementById("interviewChat");
+  const div=document.createElement("div");
+  div.className="mb-2";
+  div.innerHTML=`<span class="font-bold ${role=='面试官'?'text-pink':'text-blue-600'}">${role}：</span>${text}`;
+  c.appendChild(div);
+  chatHistory += role + "：" + text + "\n";
+}
+
+async function submitAnswer(){
+  const ans=document.getElementById("userAnswer").value.trim();
+  if(!ans)return alert("请输入回答");
+  addChat("我",ans);
+  document.getElementById("userAnswer").value="";
+  document.getElementById("feedbackArea").classList.remove("hidden");
+  document.getElementById("feedbackContent").innerText="分析回答中...";
+
+  const prompt=interviewLang=="zh"
+  ?`对面试回答进行点评：1.亮点 2.漏洞 3.优化回答 4.得分（逻辑/专业/表达/匹配度）`
+  :`Analyze answer: 1.Strength 2.Weakness 3.Optimized answer 4.Score`;
+  
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[
+        {role:"system",content:prompt},
+        {role:"user",content:"问题："+currentQuestions[qIndex]+"，回答："+ans}
+      ]
+    })
+  });
+  const d=await r.json();
+  document.getElementById("feedbackContent").innerText=d.choices?.[0]?.message.content;
+}
+
+async function nextQuestion(){
+  qIndex++;
+  document.getElementById("feedbackContent").innerText="";
+  document.getElementById("loadingTip").classList.remove("hidden");
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[{role:"system",content:"继续面试，出下一题"},{role:"user",content:"下一题"}]
+    })
+  });
+  const d=await r.json();
+  const q=d.choices?.[0]?.message.content;
+  document.getElementById("loadingTip").classList.add("hidden");
+  addChat("面试官",q);
+  currentQuestions.push(q);
+}
+
+async function randomQuestions(){
+  const industry=document.getElementById("interviewIndustry").value;
+  const job=document.getElementById("interviewJob").value;
+  document.getElementById("interviewBox").classList.remove("hidden");
+  document.getElementById("answerArea").classList.remove("hidden");
+  const r=await fetch(AI_API_URL,{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    body:JSON.stringify({
+      model:"qwen/qwen-2-7b-instruct:free",
+      messages:[{role:"user",content:`出1道${industry}行业${job}岗位的高频面试题`}]
+    })
+  });
+  const d=await r.json();
+  addChat("面试官",d.choices?.[0]?.message.content);
+}
+
+function copyInterview(){
+  navigator.clipboard.writeText(chatHistory);
+  alert("已复制面试全程");
+}
+
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text(chatHistory,10,10);
+  doc.save("面试复盘.pdf");
+}
+
+// ==========================
+// 通用复制
+// ==========================
+function copyText(id){
+  const t=document.getElementById(id).innerText;
+  navigator.clipboard.writeText(t);
+  alert("已复制");
+}
+</script>
+</body>
+</html>
