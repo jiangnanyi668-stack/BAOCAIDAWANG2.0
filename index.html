@@ -458,18 +458,11 @@ tailwind.config = {
 </div>
 
 <script>
-// ==========================
-// ✅ 你的 GROQCLOUD API 已填好
-// ==========================
 const AI_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const AI_API_KEY = "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";
-
 let selectedStyle = "应届生";
 let polishType = 1;
 
-// ==========================
-// 模块切换
-// ==========================
 function switchTab(num) {
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.remove('bg-pink','text-white');
@@ -480,9 +473,6 @@ function switchTab(num) {
   document.getElementById('module'+num).classList.remove('hidden');
 }
 
-// ==========================
-// 专业分类折叠
-// ==========================
 function toggleMajorCat(id) {
   const el = document.getElementById(id);
   el.classList.toggle('hidden');
@@ -500,9 +490,6 @@ document.querySelectorAll('.major-btn').forEach(btn=>{
   })
 })
 
-// ==========================
-// 选择按钮
-// ==========================
 const eduBtns = document.querySelectorAll("#eduLevel button");
 eduBtns.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -556,9 +543,6 @@ function getSelected(selector) {
   return Array.from(document.querySelectorAll(selector+".ring-pink")).map(i=>i.innerText).join("，");
 }
 
-// ==========================
-// 模块1：生成简历框架
-// ==========================
 document.getElementById("generateBtn").addEventListener("click", async () => {
   const name = document.getElementById("name").value.trim();
   const birth = document.getElementById("birth").value.trim();
@@ -571,11 +555,16 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   if (!name || !school || !workExp || !projectExp) return alert("请填写姓名、学校、实习/项目经历");
   document.getElementById("module1Result").innerText = "正在生成...";
   try {
+    const controller = new AbortController();
     const r = await fetch(AI_API_URL,{
       method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
       body:JSON.stringify({
-        model:"llama3-8b-8192",
+        model:"gemma2-9b-it",
         messages:[
           {role:"system",content:"你是专业简历助手，简洁专业、分点清晰、无语病空话、无特殊符号"},
           {role:"user",content:`
@@ -602,18 +591,21 @@ GPA：${gpa}
   }catch(e){document.getElementById("module1Result").innerText="网络错误，请重试"}
 });
 
-// ==========================
-// 模块2：HR评价
-// ==========================
 async function hrEvaluate(){
   const t=document.getElementById("hrInput").value.trim();
   if(!t)return alert("请输入简历内容");
   document.getElementById("hrResult").innerText="分析中...";
   try{
+    const controller = new AbortController();
     const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
       body:JSON.stringify({
-        model:"llama3-8b-8192",
+        model:"gemma2-9b-it",
         messages:[
           {role:"system",content:"你是资深HR，先分点列出修改方向，再给整体评价，专业简洁"},
           {role:"user",content:"请评价这份简历："+t}
@@ -625,11 +617,12 @@ async function hrEvaluate(){
   }catch(e){document.getElementById("hrResult").innerText="错误，请重试"}
 }
 
-// ==========================
-// 模块3：简历优化
-// ==========================
-function selectStyle(s){selectedStyle=s;
-  document.querySelectorAll('.style-btn').forEach(b=>{b.classList.remove('bg-pink','text-white');b.classList.add('bg-gray-200');});
+function selectStyle(s){
+  selectedStyle=s;
+  document.querySelectorAll('.style-btn').forEach(b=>{
+    b.classList.remove('bg-pink','text-white');
+    b.classList.add('bg-gray-200');
+  });
   event.target.classList.add('bg-pink','text-white');
   document.getElementById('selectedStyle').innerText="当前："+s+"风格";
 }
@@ -640,10 +633,16 @@ async function optimizeResume(){
   if(!b)return alert("请粘贴简历框架");
   document.getElementById("optimizedResume").innerText="生成中...";
   try{
+    const controller = new AbortController();
     const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
       body:JSON.stringify({
-        model:"llama3-8b-8192",
+        model:"gemma2-9b-it",
         messages:[
           {role:"system",content:`你是专业简历优化师，按${selectedStyle}风格优化，JD关键词、避雷空话、分点清晰、简洁专业`},
           {role:"user",content:`简历框架：${b}，修改建议：${d}`}
@@ -660,10 +659,16 @@ async function translateResume(){
   if(!t)return alert("先生成简历");
   document.getElementById("translatedResumeBox").classList.remove("hidden");
   document.getElementById("translatedResume").innerText="翻译中...";
+  const controller = new AbortController();
   const r=await fetch(AI_API_URL,{
-    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+AI_API_KEY
+    },
+    signal: controller.signal,
     body:JSON.stringify({
-      model:"llama3-8b-8192",
+      model:"gemma2-9b-it",
       messages:[
         {role:"system",content:"将简历翻译成地道、专业的英文，保持结构分点，不改变格式"},
         {role:"user",content:t}
@@ -674,11 +679,12 @@ async function translateResume(){
   document.getElementById("translatedResume").innerText=d.choices?.[0]?.message.content;
 }
 
-// ==========================
-// 模块4：经历润色
-// ==========================
-function switchPolishType(t){polishType=t;
-  document.querySelectorAll('#polishType1,#polishType2').forEach(b=>{b.classList.remove('bg-pink');b.classList.add('bg-gray-200');});
+function switchPolishType(t){
+  polishType=t;
+  document.querySelectorAll('#polishType1,#polishType2').forEach(b=>{
+    b.classList.remove('bg-pink');
+    b.classList.add('bg-gray-200');
+  });
   document.getElementById('polishType'+t).classList.add('bg-pink');
   document.querySelectorAll('.polish-content').forEach(c=>c.classList.add('hidden'));
   document.getElementById(t==1?'polishCampus':'polishBlank').classList.remove('hidden');
@@ -698,10 +704,16 @@ async function polishExperience(){
   }
   document.getElementById("polishResult").innerText="润色中...";
   try{
+    const controller = new AbortController();
     const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+AI_API_KEY
+      },
+      signal: controller.signal,
       body:JSON.stringify({
-        model:"llama3-8b-8192",
+        model:"gemma2-9b-it",
         messages:[
           {role:"system",content:"你是简历润色师，职场化、成果化、分点清晰、无语病空话"},
           {role:"user",content:p}
@@ -713,9 +725,6 @@ async function polishExperience(){
   }catch(e){document.getElementById("polishResult").innerText="错误，请重试"}
 }
 
-// ==========================
-// 模块5：AI面试
-// ==========================
 let interviewLang = "zh";
 let currentQuestions = [];
 let qIndex = 0;
@@ -745,119 +754,9 @@ async function startInterview(){
   :`You are an interviewer for ${job}. Ask questions based on resume.`;
 
   try{
+    const controller = new AbortController();
     const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
-      body:JSON.stringify({
-        model:"llama3-8b-8192",
-        messages:[
-          {role:"system",content:prompt},
-          {role:"user",content:"简历："+resume+"，请开始面试，出第一题"}
-        ]
-      })
-    });
-    const d=await r.json();
-    const q = d.choices?.[0]?.message.content;
-    document.getElementById("loadingTip").classList.add("hidden");
-    addChat("面试官",q);
-    currentQuestions=[q];
-  }catch(e){alert("网络错误，请重试")}
-}
-
-function addChat(role,text){
-  const c=document.getElementById("interviewChat");
-  const div=document.createElement("div");
-  div.className="mb-2";
-  div.innerHTML=`<span class="font-bold ${role=='面试官'?'text-pink':'text-blue-600'}">${role}：</span>${text}`;
-  c.appendChild(div);
-  chatHistory += role + "：" + text + "\n";
-}
-
-async function submitAnswer(){
-  const ans=document.getElementById("userAnswer").value.trim();
-  if(!ans)return alert("请输入回答");
-  addChat("我",ans);
-  document.getElementById("userAnswer").value="";
-  document.getElementById("feedbackArea").classList.remove("hidden");
-  document.getElementById("feedbackContent").innerText="分析回答中...";
-
-  const prompt=interviewLang=="zh"
-  ?`对面试回答进行点评：1.亮点 2.漏洞 3.优化回答 4.得分（逻辑/专业/表达/匹配度）`
-  :`Analyze answer: 1.Strength 2.Weakness 3.Optimized answer 4.Score`;
-  
-  try{
-    const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
-      body:JSON.stringify({
-        model:"llama3-8b-8192",
-        messages:[
-          {role:"system",content:prompt},
-          {role:"user",content:"问题："+currentQuestions[qIndex]+"，回答："+ans}
-        ]
-      })
-    });
-    const d=await r.json();
-    document.getElementById("feedbackContent").innerText=d.choices?.[0]?.message.content;
-  }catch(e){document.getElementById("feedbackContent").innerText="错误，请重试"}
-}
-
-async function nextQuestion(){
-  qIndex++;
-  document.getElementById("feedbackContent").innerText="";
-  document.getElementById("loadingTip").classList.remove("hidden");
-  try{
-    const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
-      body:JSON.stringify({
-        model:"llama3-8b-8192",
-        messages:[{role:"system",content:"继续面试，出下一题"},{role:"user",content:"下一题"}]
-      })
-    });
-    const d=await r.json();
-    const q=d.choices?.[0]?.message.content;
-    document.getElementById("loadingTip").classList.add("hidden");
-    addChat("面试官",q);
-    currentQuestions.push(q);
-  }catch(e){alert("网络错误，请重试")}
-}
-
-async function randomQuestions(){
-  const industry=document.getElementById("interviewIndustry").value;
-  const job=document.getElementById("interviewJob").value;
-  document.getElementById("interviewBox").classList.remove("hidden");
-  document.getElementById("answerArea").classList.remove("hidden");
-  try{
-    const r=await fetch(AI_API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_API_KEY},
-      body:JSON.stringify({
-        model:"llama3-8b-8192",
-        messages:[{role:"user",content:`出1道${industry}行业${job}岗位的高频面试题`}]
-      })
-    });
-    const d=await r.json();
-    addChat("面试官",d.choices?.[0]?.message.content);
-  }catch(e){alert("网络错误，请重试")}
-}
-
-function copyInterview(){
-  navigator.clipboard.writeText(chatHistory);
-  alert("已复制面试全程");
-}
-
-function exportPDF(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text(chatHistory,10,10);
-  doc.save("面试复盘.pdf");
-}
-
-// ==========================
-// 复制
-// ==========================
-function copyText(id){
-  const t=document.getElementById(id).innerText;
-  navigator.clipboard.writeText(t);
-  alert("已复制");
-}
-</script>
-</body>
-</html>
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "
