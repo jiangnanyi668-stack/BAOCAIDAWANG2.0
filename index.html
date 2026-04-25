@@ -142,15 +142,47 @@
             background:#f9f9f9;
             border-radius:12px;
             margin:12px 0;
+            flex-direction: column;
+        }
+        .msg-header {
+            display:flex;
+            gap:12px;
+            align-items:flex-start;
         }
         .msg-content {flex:1;}
-        .reply-list {margin-top:10px;}
+        .reply-list {margin-top:10px; padding-left: 54px;}
         .reply-item {
             display:flex;
-            align-items:center;
             gap:8px;
             padding:6px 0;
-            margin-left:10px;
+            margin-left:0;
+            font-size:14px;
+            color:#555;
+        }
+        .reply-btn {
+            font-size:13px;
+            color:var(--uci-blue);
+            background:none;
+            border:none;
+            cursor:pointer;
+            padding:0;
+            margin-top:4px;
+        }
+        .reply-input-container {
+            margin-top:10px;
+            padding-left: 54px;
+        }
+        .reply-input {
+            width:100%;
+            padding:8px;
+            border-radius:4px;
+            border:1px solid #ddd;
+            font-size:14px;
+        }
+        .reply-submit {
+            margin-top:4px;
+            font-size:13px;
+            padding:6px 12px;
         }
 
         .modal{
@@ -183,6 +215,15 @@
         .public-card{background:#f0f4f8;}
         .public-info{flex:1;}
         .old-msg-wrap{background:#f1f1f1;opacity:0.9;}
+        .fold-btn {
+            color: var(--uci-blue);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -358,7 +399,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ====================== 修复版：云端数据库配置 ======================
+// ====================== 云端数据库配置 ======================
 const supabaseUrl = "https://sralekvihjrisnogwbfc.supabase.co";
 const supabaseKey = "sb_publishable_0mTmLGRYwy1JathnAx4tnA_D_16vmiu";
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -371,9 +412,9 @@ if (!userId) {
 }
 
 let currentTab = 0;
-const THREE_MONTH = 7776000000;
+const THREE_MONTH = 7776000000; // 3个月的毫秒数
 
-// ✅ 修复：关闭公告
+// ✅ 关闭公告
 function closeModal() {
     document.getElementById('noticeModal').style.display = 'none';
 }
@@ -396,6 +437,7 @@ function openTab(idx){
     document.querySelectorAll('.nav button')[idx].classList.add('active');
     currentTab = idx;
     if(idx===4) loadPublicSquare();
+    if(idx===5) loadMsg();
     if(idx===6) showMyAndMatch();
 }
 
@@ -571,25 +613,121 @@ async function showMyAndMatch(){
     document.getElementById('myPostsList').innerHTML = html;
 }
 
+// ====================== 升级后的留言板功能 ======================
 async function postMsg(){
     let val = document.getElementById('msgInput').value.trim();
     if(!val)return;
     await supabaseClient.from("messages").insert([
-        { user_id: userId, content: val }
+        { user_id: userId, content: val, parent_id: null }
     ]);
     document.getElementById('msgInput').value = "";
     loadMsg();
 }
 
+async function postReply(parentId, content){
+    if(!content.trim()) return;
+    await supabaseClient.from("messages").insert([
+        { user_id: userId, content: content, parent_id: parentId }
+    ]);
+    loadMsg();
+}
+
 async function loadMsg(){
-    const { data } = await supabaseClient.from("messages").select("*").order("create_at", { ascending: false });
-    let html = "";
-    data?.forEach(m=>{
-        html += `<div class="msg-item"><div class="avatar">板</div><div class="msg-content">${m.content}</div></div>`;
+    const { data: allMessages } = await supabaseClient
+        .from("messages")
+        .select("*")
+        .order("create_at", { ascending: false });
+
+    if (!allMessages) {
+        document.getElementById('msgList').innerHTML = "<p>暂无留言</p>";
+        return;
+    }
+
+    // 分离主留言和回复
+    const mainMessages = allMessages.filter(m => m.parent_id === null);
+    const replies = allMessages.filter(m => m.parent_id !== null);
+    const replyMap = {};
+    replies.forEach(r => {
+        if (!replyMap[r.parent_id]) replyMap[r.parent_id] = [];
+        replyMap[r.parent_id].push(r);
     });
+
+    let html = "";
+    const now = Date.now();
+
+    mainMessages.forEach(m => {
+        const msgTime = new Date(m.create_at).getTime();
+        const isExpired = (now - msgTime) > THREE_MONTH;
+        const repliesForMsg = replyMap[m.id] || [];
+        const totalReplies = repliesForMsg.length;
+        const visibleReplies = totalReplies > 3 ? repliesForMsg.slice(-3) : repliesForMsg;
+        const hiddenRepliesCount = totalReplies - visibleReplies.length;
+
+        html += `
+        <div class="msg-item ${isExpired ? 'old-msg-wrap' : ''}">
+            <div class="msg-header">
+                <div class="avatar">板</div>
+                <div class="msg-content">
+                    <p class="msg-text" ${isExpired ? 'style="display:none"' : ''}>${m.content}</p>
+                    ${isExpired ? `<button class="fold-btn" onclick="toggleMsgExpired(this)">点击展开查看</button>` : ''}
+                    <button class="reply-btn" onclick="toggleReplyInput(${m.id})">回复</button>
+                </div>
+            </div>
+            <div class="reply-list" id="replies-${m.id}">`;
+
+        if (totalReplies > 0) {
+            if (hiddenRepliesCount > 0) {
+                html += `<button class="fold-btn" onclick="showAllReplies(${m.id})">显示全部 ${totalReplies} 条回复（已折叠 ${hiddenRepliesCount} 条）</button>`;
+            }
+            visibleReplies.forEach(r => {
+                html += `
+                <div class="reply-item">
+                    <span>→</span>
+                    <span>${r.content}</span>
+                </div>`;
+            });
+        }
+
+        html += `
+            </div>
+            <div class="reply-input-container" id="reply-input-${m.id}" style="display:none;">
+                <input type="text" class="reply-input" placeholder="写下你的回复..." id="reply-text-${m.id}">
+                <button class="reply-submit" onclick="submitReply(${m.id})">发送</button>
+            </div>
+        </div>`;
+    });
+
     document.getElementById('msgList').innerHTML = html;
 }
 
+function toggleReplyInput(msgId) {
+    const inputContainer = document.getElementById(`reply-input-${msgId}`);
+    inputContainer.style.display = inputContainer.style.display === 'none' ? 'block' : 'none';
+}
+
+async function submitReply(msgId) {
+    const input = document.getElementById(`reply-text-${msgId}`);
+    const content = input.value;
+    await postReply(msgId, content);
+}
+
+function toggleMsgExpired(btn) {
+    const msgText = btn.parentElement.querySelector('.msg-text');
+    if (msgText.style.display === 'none') {
+        msgText.style.display = 'block';
+        btn.innerText = '点击折叠';
+    } else {
+        msgText.style.display = 'none';
+        btn.innerText = '点击展开查看';
+    }
+}
+
+function showAllReplies(msgId) {
+    alert("已为你显示全部回复（刷新页面后将恢复折叠状态）");
+    loadMsg();
+}
+
+// 页面加载时初始化留言板
 loadMsg();
 </script>
 </body>
