@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCI 校园搭子匹配站</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,Microsoft YaHei,sans-serif;}
+        :root {
+            --uci-blue:#00558c;
+            --uci-gold:#ffcc00;
+            --bg:#fff;
+            --box:#f7f7f7;
+            --color-class: #8B9EA8;
+            --color-sport: #B0C4B3;
+            --color-meal: #C9B9B3;
+            --color-game: #A1B8C4;
+            --color-msg: #97ABB1;
+            --color-reply: #BCB9C9;
+        }
+        body{background:var(--bg);}
+
+        .header{
+            background:var(--uci-blue);
+            color:white;
+            padding:22px 30px;
+            display:flex;
+            justify-content:flex-start;
+            align-items:center;
+        }
+        .site-title{
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .nav{
+            background:var(--uci-gold);
+            display:flex;
+            justify-content:center;
+            gap:12px;
+            padding:18px 0;
+            flex-wrap:wrap;
+        }
+        .nav button{
+            background:none;
+            border:none;
+            font-size:15px;
+            font-weight:bold;
+            cursor:pointer;
+            padding:8px 10px;
+            border-radius:6px;
+        }
+        .nav button.active{
+            background:var(--uci-blue);
+            color:white;
+        }
+
+        .page{
+            display:none;
+            padding:25px;
+            max-width:1100px;
+            margin:auto;
+        }
+        .page.show{display:block;}
+
+        input,select,textarea{
+            width:100%;
+            padding:11px;
+            margin:8px 0;
+            border-radius:6px;
+            border:1px solid #ddd;
+            font-size:15px;
+        }
+        .btn-group{display:flex;gap:10px;align-items:center;}
+
+        .filter-wrap{
+            background:#f5f7fa;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+            display:grid;
+            grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+            gap:10px;
+        }
+        .filter-wrap select,.filter-wrap button{
+            margin:0;
+        }
+
+        .time-btns{
+            display:grid;
+            grid-template-columns:repeat(5,1fr);
+            gap:10px;
+            margin:12px 0;
+        }
+        .time-btn{
+            background:#eee;
+            border:none;
+            padding:10px;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .time-btn.selected{
+            background:var(--uci-blue);
+            color:white;
+        }
+
+        button{
+            background:var(--uci-blue);
+            color:white;
+            border:none;
+            padding:10px 16px;
+            border-radius:6px;
+            cursor:pointer;
+            margin:6px 0;
+            font-size:16px;
+        }
+        .btn-gold{
+            background:var(--uci-gold);
+            color:#000;
+        }
+        .exchange-btn{background:var(--uci-blue);}
+        .fold-btn {color:#666;font-size:14px;cursor:pointer;margin:4px 0;}
+
+        .avatar{
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-weight:bold;
+            flex-shrink:0;
+        }
+
+        .msg-item {
+            display:flex;
+            gap:12px;
+            padding:16px;
+            background:#f9f9f9;
+            border-radius:12px;
+            margin:12px 0;
+        }
+        .msg-content {flex:1;}
+        .reply-list {margin-top:10px;}
+        .reply-item {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:6px 0;
+            margin-left:10px;
+        }
+
+        .modal{
+            position:fixed;
+            top:0;left:0;
+            width:100%;height:100%;
+            background:rgba(0,0,0,0.5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:9999;
+        }
+        .modal-box{
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            max-width:580px;
+            width:90%;
+            line-height:1.7;
+        }
+
+        .my-post,.public-card{
+            padding:16px;
+            border-radius:10px;
+            margin:10px 0;
+            display:flex;
+            gap:12px;
+        }
+        .my-post{background:#fff5e6;}
+        .public-card{background:#f0f4f8;}
+        .public-info{flex:1;}
+        .old-msg-wrap{background:#f1f1f1;opacity:0.9;}
+    </style>
+</head>
+<body>
+
+<div class="modal" id="noticeModal">
+    <div class="modal-box">
+        <h3>网站使用公告 & 发帖规则</h3>
+        <p>1. 课友/运动/饭搭/游戏/公开广场五大模块：每半年统一清空数据（周期：1–5月、6–12月）</p>
+        <p>2. 匿名留言板：每半年自动清空，周期：1–5月、6–12月</p>
+        <p>3. 留言板规则：回复超3条自动折叠最早内容；发布满3个月整条留言自动折叠</p>
+        <p>4. 公开广场：发布超过3个月的帖子自动折叠，可点击展开查看；支持多条件标签筛选</p>
+        <p>5. 帖子分为公开/私密：公开帖展示基础信息，联系方式需双向解锁</p>
+        <p>6. 交换联系方式条件：账号至少发布过1条有效帖子</p>
+        <p>7. 请勿泄露隐私信息，线下见面谨慎辨别，禁止发布违规内容</p>
+        <button onclick="closeModal()">我已阅读并遵守</button>
+    </div>
+</div>
+
+<div class="header">
+    <span class="site-title">UCI 校园搭子匹配站</span>
+</div>
+
+<div class="nav">
+    <button onclick="openTab(0)" class="active">课友</button>
+    <button onclick="openTab(1)">运动搭子</button>
+    <button onclick="openTab(2)">饭搭子</button>
+    <button onclick="openTab(3)">游戏搭子</button>
+    <button onclick="openTab(4)">公开广场</button>
+    <button onclick="openTab(5)">留言板</button>
+    <button onclick="openTab(6)">我的发布</button>
+</div>
+
+<div class="page show" id="page0">
+    <h3>发布课友信息</h3>
+    <input type="text" id="c_code" placeholder="课程编码">
+    <input type="text" id="c_name" placeholder="课程名称（选填）">
+    <input type="text" id="c_date" placeholder="日期（选填 例：2026.04.25）">
+    <select id="c_week">
+        <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+    </select>
+    <div class="time-btns">
+        <button class="time-btn" onclick="selTime(this)">07:00-10:00</button>
+        <button class="time-btn" onclick="selTime(this)">10:00-13:00</button>
+        <button class="time-btn" onclick="selTime(this)">13:00-16:00</button>
+        <button class="time-btn" onclick="selTime(this)">16:00-19:00</button>
+        <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
+    </div>
+    <textarea id="c_public" placeholder="公开备注"></textarea>
+    <textarea id="c_private" placeholder="私密联系方式"></textarea>
+    <div class="btn-group">
+        <button onclick="postClass()">提交发布</button>
+        <button class="btn-gold" onclick="postClassPublic()">公开发布</button>
+    </div>
+</div>
+
+<div class="page" id="page1">
+    <h3>发布运动搭子</h3>
+    <select id="s_type">
+        <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option><option>其他</option>
+    </select>
+    <input type="text" id="s_date" placeholder="日期（选填）">
+    <select id="s_week">
+        <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+    </select>
+    <div class="time-btns">
+        <button class="time-btn" onclick="selTime(this)">07:00-10:00</button>
+        <button class="time-btn" onclick="selTime(this)">10:00-13:00</button>
+        <button class="time-btn" onclick="selTime(this)">13:00-16:00</button>
+        <button class="time-btn" onclick="selTime(this)">16:00-19:00</button>
+        <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
+    </div>
+    <textarea id="s_public" placeholder="公开备注"></textarea>
+    <textarea id="s_private" placeholder="私密联系方式"></textarea>
+    <div class="btn-group">
+        <button onclick="postSport()">提交发布</button>
+        <button class="btn-gold" onclick="postSportPublic()">公开发布</button>
+    </div>
+</div>
+
+<div class="page" id="page2">
+    <h3>发布饭搭子</h3>
+    <select id="f_type">
+        <option>中餐</option><option>韩餐</option><option>日料</option><option>奶茶</option><option>食堂</option><option>其他</option>
+    </select>
+    <input type="text" id="f_date" placeholder="日期（选填）">
+    <select id="f_week">
+        <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+    </select>
+    <div class="time-btns">
+        <button class="time-btn" onclick="selTime(this)">07:00-10:00</button>
+        <button class="time-btn" onclick="selTime(this)">10:00-13:00</button>
+        <button class="time-btn" onclick="selTime(this)">13:00-16:00</button>
+        <button class="time-btn" onclick="selTime(this)">16:00-19:00</button>
+        <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
+    </div>
+    <textarea id="f_public" placeholder="口味/需求"></textarea>
+    <textarea id="f_private" placeholder="私密联系方式"></textarea>
+    <div class="btn-group">
+        <button onclick="postMeal()">提交发布</button>
+        <button class="btn-gold" onclick="postMealPublic()">公开发布</button>
+    </div>
+</div>
+
+<div class="page" id="page3">
+    <h3>发布游戏搭子</h3>
+    <select id="g_type">
+        <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option><option>CS2</option>
+        <option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option><option>和平精英</option><option>永劫无间</option><option>金铲铲之战</option><option>守望先锋</option><option>崩坏：星穹铁道</option><option>其他</option>
+    </select>
+    <input type="text" id="g_date" placeholder="日期（选填）">
+    <select id="g_week">
+        <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+    </select>
+    <div class="time-btns">
+        <button class="time-btn" onclick="selTime(this)">07:00-10:00</button>
+        <button class="time-btn" onclick="selTime(this)">10:00-13:00</button>
+        <button class="time-btn" onclick="selTime(this)">13:00-16:00</button>
+        <button class="time-btn" onclick="selTime(this)">16:00-19:00</button>
+        <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
+    </div>
+    <textarea id="g_public" placeholder="游戏习惯/组队要求"></textarea>
+    <textarea id="g_private" placeholder="联系方式"></textarea>
+    <div class="btn-group">
+        <button onclick="postGame()">提交发布</button>
+        <button class="btn-gold" onclick="postGamePublic()">公开发布</button>
+    </div>
+</div>
+
+<div class="page" id="page4">
+    <h3>公开帖子广场</h3>
+    <div class="filter-wrap">
+        <select id="filterType">
+            <option value="">全部分类</option>
+            <option>课友</option>
+            <option>运动搭子</option>
+            <option>饭搭子</option>
+            <option>游戏搭子</option>
+        </select>
+        <select id="filterTime">
+            <option value="">全部时段</option>
+            <option>07:00-10:00</option>
+            <option>10:00-13:00</option>
+            <option>13:00-16:00</option>
+            <option>16:00-19:00</option>
+            <option>19:00-22:00</option>
+        </select>
+        <select id="filterTag">
+            <option value="">全部标签</option>
+            <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option>
+            <option>中餐</option><option>韩餐</option><option>日料</option><option>奶茶</option><option>食堂</option>
+            <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option>
+            <option>CS2</option><option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option>
+            <option>和平精英</option><option>永劫无间</option><option>金铲铲之战</option><option>守望先锋</option>
+            <option>崩坏：星穹铁道</option><option>其他</option>
+        </select>
+        <button onclick="filterPublicPost()">筛选</button>
+        <button class="btn-gold" onclick="resetFilter()">重置</button>
+    </div>
+    <div id="publicSquare"></div>
+</div>
+
+<div class="page" id="page5">
+    <h3>匿名留言板</h3>
+    <textarea id="msgInput" placeholder="写下你想说的..."></textarea>
+    <button onclick="postMsg()">发布匿名帖子</button>
+    <div id="msgList"></div>
+</div>
+
+<div class="page" id="page6">
+    <h3>我的发布 & 匹配记录</h3>
+    <div id="myPostsList"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ====================== 修复版：云端数据库配置 ======================
+const supabaseUrl = "https://sralekvihjrisnogwbfc.supabase.co";
+const supabaseKey = "sb_publishable_0mTmLGRYwy1JathnAx4tnA_D_16vmiu";
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+// 用户唯一ID
+let userId = localStorage.getItem("userId");
+if (!userId) {
+    userId = Math.random().toString(36).slice(2,10);
+    localStorage.setItem("userId", userId);
+}
+
+let currentTab = 0;
+const THREE_MONTH = 7776000000;
+
+// ✅ 修复：关闭公告
+function closeModal() {
+    document.getElementById('noticeModal').style.display = 'none';
+}
+
+// 初始化显示公告
+document.getElementById('noticeModal').style.display = 'flex';
+
+function getAvatarColor(type){
+    if(type.includes("课友")) return 'var(--color-class)';
+    if(type.includes("运动")) return 'var(--color-sport)';
+    if(type.includes("饭搭")) return 'var(--color-meal)';
+    if(type.includes("游戏")) return 'var(--color-game)';
+    return 'var(--color-msg)';
+}
+
+function openTab(idx){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    document.getElementById('page'+idx).classList.add('show');
+    document.querySelectorAll('.nav button')[idx].classList.add('active');
+    currentTab = idx;
+    if(idx===4) loadPublicSquare();
+    if(idx===6) showMyAndMatch();
+}
+
+function selTime(btn){
+    const wrap = btn.parentElement;
+    const selected = wrap.querySelectorAll('.selected');
+    if(btn.classList.contains('selected')){
+        btn.classList.remove('selected');
+    }else{
+        if(selected.length>=2) return alert('最多选择2个时间段');
+        btn.classList.add('selected');
+    }
+}
+
+function getTimes(wrapSel){
+    let arr=[];
+    document.querySelectorAll(wrapSel+' .time-btn.selected').forEach(b=>arr.push(b.innerText));
+    return arr;
+}
+
+function postClass(){saveBuddy("课友",getClassData(),false);}
+function postClassPublic(){saveBuddy("课友",getClassData(),true);}
+function postSport(){saveBuddy("运动搭子",getSportData(),false);}
+function postSportPublic(){saveBuddy("运动搭子",getSportData(),true);}
+function postMeal(){saveBuddy("饭搭子",getMealData(),false);}
+function postMealPublic(){saveBuddy("饭搭子",getMealData(),true);}
+function postGame(){saveBuddy("游戏搭子",getGameData(),false);}
+function postGamePublic(){saveBuddy("游戏搭子",getGameData(),true);}
+
+function getClassData(){
+    return {
+        code:document.getElementById('c_code').value,
+        name:document.getElementById('c_name').value,
+        date:document.getElementById('c_date').value,
+        week:document.getElementById('c_week').value,
+        times:getTimes("#page0"),
+        pubTxt:document.getElementById('c_public').value,
+        priTxt:document.getElementById('c_private').value
+    }
+}
+
+function getSportData(){
+    return {
+        type:document.getElementById('s_type').value,
+        date:document.getElementById('s_date').value,
+        week:document.getElementById('s_week').value,
+        times:getTimes("#page1"),
+        pubTxt:document.getElementById('s_public').value,
+        priTxt:document.getElementById('s_private').value
+    }
+}
+
+function getMealData(){
+    return {
+        type:document.getElementById('f_type').value,
+        date:document.getElementById('f_date').value,
+        week:document.getElementById('f_week').value,
+        times:getTimes("#page2"),
+        pubTxt:document.getElementById('f_public').value,
+        priTxt:document.getElementById('f_private').value
+    }
+}
+
+function getGameData(){
+    return {
+        type:document.getElementById('g_type').value,
+        date:document.getElementById('g_date').value,
+        week:document.getElementById('g_week').value,
+        times:getTimes("#page3"),
+        pubTxt:document.getElementById('g_public').value,
+        priTxt:document.getElementById('g_private').value
+    }
+}
+
+async function saveBuddy(type,data,isPublic){
+    const postObj = {
+        user_id: userId,
+        type: type,
+        tag: data.type || "",
+        week: data.week,
+        times: data.times,
+        date: data.date || "",
+        pub_txt: data.pubTxt || "",
+        pri_txt: data.priTxt || "",
+        is_public: isPublic
+    };
+
+    const { error } = await supabaseClient.from("posts").insert([postObj]);
+    if (error) {
+        alert("发布失败：" + error.message);
+        return;
+    }
+
+    alert("发布成功！");
+    openTab(6);
+}
+
+async function loadPublicSquare(){
+    const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("is_public", true)
+        .order("create_at", { ascending: false });
+
+    renderPublicHtml(data || []);
+}
+
+function filterPublicPost(){
+    let typeVal = document.getElementById('filterType').value;
+    let timeVal = document.getElementById('filterTime').value;
+    let tagVal = document.getElementById('filterTag').value;
+    loadPublicSquare();
+}
+
+function resetFilter(){
+    document.getElementById('filterType').value = "";
+    document.getElementById('filterTime').value = "";
+    document.getElementById('filterTag').value = "";
+    loadPublicSquare();
+}
+
+function renderPublicHtml(list){
+    let html='';
+    const now = Date.now();
+    if(!list || list.length===0) return document.getElementById('publicSquare').innerHTML="<p>暂无公开帖子</p>";
+    list.forEach(p=>{
+        let isOld = (new Date(p.create_at).getTime() < now - THREE_MONTH);
+        html+=`
+        <div class="public-card ${isOld?'old-msg-wrap':''}">
+            <div class="avatar" style="background:${getAvatarColor(p.type)}">匿</div>
+            <div class="public-info">
+                <b>${p.type}</b><br>
+                标签：${p.tag || '无'}<br>
+                日期：${p.date || '未填写'}<br>
+                星期：${p.week}<br>
+                时段：${(p.times || []).join(' / ')}<br>
+                备注：${p.pub_txt || '无'}<br>
+                <button onclick="tryExchange()">申请交换联系方式</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('publicSquare').innerHTML = html;
+}
+
+function tryExchange(){
+    alert("交换功能：双方都发布过帖子即可解锁");
+}
+
+async function showMyAndMatch(){
+    const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("user_id", userId)
+        .order("create_at", { ascending: false });
+
+    let html = "";
+    if (!data || data.length === 0) {
+        document.getElementById('myPostsList').innerHTML = "<p>你还没有发布</p>";
+        return;
+    }
+    data.forEach(p=>{
+        html += `
+        <div class="my-post">
+            <b>【${p.type}】${p.is_public?"公开":"私密"}</b><br>
+            标签：${p.tag || "无"}<br>
+            日期：${p.date || "无"}<br>
+            星期：${p.week}<br>
+            时段：${(p.times||[]).join(' / ')}<br>
+            备注：${p.pub_txt || "无"}<br>
+            联系方式：${p.pri_txt || "未填写"}
+        </div><hr>`;
+    });
+    document.getElementById('myPostsList').innerHTML = html;
+}
+
+async function postMsg(){
+    let val = document.getElementById('msgInput').value.trim();
+    if(!val)return;
+    await supabaseClient.from("messages").insert([
+        { user_id: userId, content: val }
+    ]);
+    document.getElementById('msgInput').value = "";
+    loadMsg();
+}
+
+async function loadMsg(){
+    const { data } = await supabaseClient.from("messages").select("*").order("create_at", { ascending: false });
+    let html = "";
+    data?.forEach(m=>{
+        html += `<div class="msg-item"><div class="avatar">板</div><div class="msg-content">${m.content}</div></div>`;
+    });
+    document.getElementById('msgList').innerHTML = html;
+}
+
+loadMsg();
+</script>
+</body>
+</html>
