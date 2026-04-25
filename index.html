@@ -215,15 +215,6 @@
         .public-card{background:#f0f4f8;}
         .public-info{flex:1;}
         .old-msg-wrap{background:#f1f1f1;opacity:0.9;}
-        .fold-btn {
-            color: var(--uci-blue);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            font-size: 14px;
-            margin-top: 4px;
-        }
     </style>
 </head>
 <body>
@@ -399,12 +390,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ====================== 云端数据库配置 ======================
 const supabaseUrl = "https://sralekvihjrisnogwbfc.supabase.co";
 const supabaseKey = "sb_publishable_0mTmLGRYwy1JathnAx4tnA_D_16vmiu";
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-// 用户唯一ID
 let userId = localStorage.getItem("userId");
 if (!userId) {
     userId = Math.random().toString(36).slice(2,10);
@@ -412,14 +401,11 @@ if (!userId) {
 }
 
 let currentTab = 0;
-const THREE_MONTH = 7776000000; // 3个月的毫秒数
+const THREE_MONTH = 7776000000;
 
-// ✅ 关闭公告
 function closeModal() {
     document.getElementById('noticeModal').style.display = 'none';
 }
-
-// 初始化显示公告
 document.getElementById('noticeModal').style.display = 'flex';
 
 function getAvatarColor(type){
@@ -530,7 +516,6 @@ async function saveBuddy(type,data,isPublic){
         alert("发布失败：" + error.message);
         return;
     }
-
     alert("发布成功！");
     openTab(6);
 }
@@ -540,18 +525,14 @@ async function loadPublicSquare(){
         .from("posts")
         .select("*")
         .eq("is_public", true)
-        .order("create_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
     renderPublicHtml(data || []);
 }
 
 function filterPublicPost(){
-    let typeVal = document.getElementById('filterType').value;
-    let timeVal = document.getElementById('filterTime').value;
-    let tagVal = document.getElementById('filterTag').value;
     loadPublicSquare();
 }
-
 function resetFilter(){
     document.getElementById('filterType').value = "";
     document.getElementById('filterTime').value = "";
@@ -564,7 +545,7 @@ function renderPublicHtml(list){
     const now = Date.now();
     if(!list || list.length===0) return document.getElementById('publicSquare').innerHTML="<p>暂无公开帖子</p>";
     list.forEach(p=>{
-        let isOld = (new Date(p.create_at).getTime() < now - THREE_MONTH);
+        let isOld = (new Date(p.created_at).getTime() < now - THREE_MONTH);
         html+=`
         <div class="public-card ${isOld?'old-msg-wrap':''}">
             <div class="avatar" style="background:${getAvatarColor(p.type)}">匿</div>
@@ -587,11 +568,11 @@ function tryExchange(){
 }
 
 async function showMyAndMatch(){
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
         .from("posts")
         .select("*")
         .eq("user_id", userId)
-        .order("create_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
     let html = "";
     if (!data || data.length === 0) {
@@ -613,7 +594,7 @@ async function showMyAndMatch(){
     document.getElementById('myPostsList').innerHTML = html;
 }
 
-// ====================== 升级后的留言板功能 ======================
+// 留言板 完整修复版
 async function postMsg(){
     let val = document.getElementById('msgInput').value.trim();
     if(!val)return;
@@ -636,14 +617,13 @@ async function loadMsg(){
     const { data: allMessages } = await supabaseClient
         .from("messages")
         .select("*")
-        .order("create_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
-    if (!allMessages) {
+    if (!allMessages || allMessages.length === 0) {
         document.getElementById('msgList').innerHTML = "<p>暂无留言</p>";
         return;
     }
 
-    // 分离主留言和回复
     const mainMessages = allMessages.filter(m => m.parent_id === null);
     const replies = allMessages.filter(m => m.parent_id !== null);
     const replyMap = {};
@@ -656,43 +636,37 @@ async function loadMsg(){
     const now = Date.now();
 
     mainMessages.forEach(m => {
-        const msgTime = new Date(m.create_at).getTime();
+        const msgTime = new Date(m.created_at).getTime();
         const isExpired = (now - msgTime) > THREE_MONTH;
         const repliesForMsg = replyMap[m.id] || [];
         const totalReplies = repliesForMsg.length;
         const visibleReplies = totalReplies > 3 ? repliesForMsg.slice(-3) : repliesForMsg;
-        const hiddenRepliesCount = totalReplies - visibleReplies.length;
+        const hiddenCount = totalReplies - visibleReplies.length;
 
         html += `
         <div class="msg-item ${isExpired ? 'old-msg-wrap' : ''}">
             <div class="msg-header">
                 <div class="avatar">板</div>
                 <div class="msg-content">
-                    <p class="msg-text" ${isExpired ? 'style="display:none"' : ''}>${m.content}</p>
-                    ${isExpired ? `<button class="fold-btn" onclick="toggleMsgExpired(this)">点击展开查看</button>` : ''}
-                    <button class="reply-btn" onclick="toggleReplyInput(${m.id})">回复</button>
+                    <p class="msg-text" ${isExpired?'style="display:none"':''}>${m.content}</p>
+                    ${isExpired ? `<button class="fold-btn" onclick="toggleHide(this)">点击展开查看</button>` : ''}
+                    <button class="reply-btn" onclick="toggleReplyBox(${m.id})">回复</button>
                 </div>
             </div>
-            <div class="reply-list" id="replies-${m.id}">`;
+            <div class="reply-list">`;
 
-        if (totalReplies > 0) {
-            if (hiddenRepliesCount > 0) {
-                html += `<button class="fold-btn" onclick="showAllReplies(${m.id})">显示全部 ${totalReplies} 条回复（已折叠 ${hiddenRepliesCount} 条）</button>`;
-            }
-            visibleReplies.forEach(r => {
-                html += `
-                <div class="reply-item">
-                    <span>→</span>
-                    <span>${r.content}</span>
-                </div>`;
-            });
+        if(hiddenCount > 0){
+            html += `<button class="fold-btn" onclick="alert('刷新显示全部')">折叠了${hiddenCount}条早期回复</button>`;
         }
+        visibleReplies.forEach(r=>{
+            html += `<div class="reply-item">→ ${r.content}</div>`;
+        });
 
         html += `
             </div>
-            <div class="reply-input-container" id="reply-input-${m.id}" style="display:none;">
-                <input type="text" class="reply-input" placeholder="写下你的回复..." id="reply-text-${m.id}">
-                <button class="reply-submit" onclick="submitReply(${m.id})">发送</button>
+            <div id="replyBox${m.id}" style="display:none;padding-left:54px;">
+                <input class="reply-input" id="replyTxt${m.id}" placeholder="输入回复内容">
+                <button class="reply-submit" onclick="sendReply(${m.id})">发送回复</button>
             </div>
         </div>`;
     });
@@ -700,34 +674,26 @@ async function loadMsg(){
     document.getElementById('msgList').innerHTML = html;
 }
 
-function toggleReplyInput(msgId) {
-    const inputContainer = document.getElementById(`reply-input-${msgId}`);
-    inputContainer.style.display = inputContainer.style.display === 'none' ? 'block' : 'none';
+function toggleReplyBox(id){
+    const box = document.getElementById("replyBox"+id);
+    box.style.display = box.style.display === "none" ? "block" : "none";
 }
-
-async function submitReply(msgId) {
-    const input = document.getElementById(`reply-text-${msgId}`);
-    const content = input.value;
-    await postReply(msgId, content);
+async function sendReply(id){
+    const txt = document.getElementById("replyTxt"+id).value;
+    await postReply(id,txt);
 }
-
-function toggleMsgExpired(btn) {
-    const msgText = btn.parentElement.querySelector('.msg-text');
-    if (msgText.style.display === 'none') {
-        msgText.style.display = 'block';
-        btn.innerText = '点击折叠';
-    } else {
-        msgText.style.display = 'none';
-        btn.innerText = '点击展开查看';
+function toggleHide(btn){
+    const p = btn.previousElementSibling;
+    if(p.style.display==="none"){
+        p.style.display="block";
+        btn.innerText="点击折叠";
+    }else{
+        p.style.display="none";
+        btn.innerText="点击展开查看";
     }
 }
 
-function showAllReplies(msgId) {
-    alert("已为你显示全部回复（刷新页面后将恢复折叠状态）");
-    loadMsg();
-}
-
-// 页面加载时初始化留言板
+// 初始化
 loadMsg();
 </script>
 </body>
