@@ -215,6 +215,25 @@
         .public-card{background:#f0f4f8;}
         .public-info{flex:1;}
         .old-msg-wrap{background:#f1f1f1;opacity:0.9;}
+
+        .match-count{
+            color: #00558c;
+            font-size:14px;
+            font-weight:bold;
+            margin:4px 0;
+        }
+        .delete-btn{
+            background:#e53935;
+            padding:6px 12px;
+            font-size:14px;
+            margin-top:8px;
+        }
+        .matched-contact{
+            color:#0277bd;
+            font-weight:bold;
+            margin-top:6px;
+            font-size:15px;
+        }
     </style>
 </head>
 <body>
@@ -403,6 +422,50 @@ if (!userId) {
 let currentTab = 0;
 const THREE_MONTH = 7776000000;
 
+// 匹配表（新增）
+async function createMatch(postId, targetUserId) {
+    const { data: exists } = await supabaseClient
+        .from("matches")
+        .select("*")
+        .eq("from_user", userId)
+        .eq("post_id", postId)
+        .single();
+
+    if (exists) return alert("你已经申请过匹配");
+
+    await supabaseClient.from("matches").insert([
+        { from_user: userId, to_user: targetUserId, post_id: postId }
+    ]);
+    alert("匹配申请成功！双方互关后自动解锁联系方式");
+}
+
+async function getMatchCount(postId) {
+    const { count } = await supabaseClient
+        .from("matches")
+        .select("*", { count: "exact" })
+        .eq("post_id", postId);
+    return count || 0;
+}
+
+async function isMutualMatch(postUserId, postId) {
+    const { data: meToThem } = await supabaseClient
+        .from("matches")
+        .select("*")
+        .eq("from_user", userId)
+        .eq("post_id", postId)
+        .single();
+
+    const { data: themToMe } = await supabaseClient
+        .from("matches")
+        .select("*")
+        .eq("from_user", postUserId)
+        .eq("from_user", postUserId)
+        .single();
+
+    return !!(meToThem && themToMe);
+}
+
+// 关闭公告
 function closeModal() {
     document.getElementById('noticeModal').style.display = 'none';
 }
@@ -540,13 +603,17 @@ function resetFilter(){
     loadPublicSquare();
 }
 
-function renderPublicHtml(list){
+async function renderPublicHtml(list){
     let html='';
     const now = Date.now();
     if(!list || list.length===0) return document.getElementById('publicSquare').innerHTML="<p>暂无公开帖子</p>";
-    list.forEach(p=>{
-        let isOld = (new Date(p.created_at).getTime() < now - THREE_MONTH);
-        html+=`
+
+    for (let p of list) {
+        const matchCount = await getMatchCount(p.id);
+        const mutual = await isMutualMatch(p.user_id, p.id);
+        const isOld = (new Date(p.created_at).getTime() < now - THREE_MONTH);
+
+        html += `
         <div class="public-card ${isOld?'old-msg-wrap':''}">
             <div class="avatar" style="background:${getAvatarColor(p.type)}">匿</div>
             <div class="public-info">
@@ -556,15 +623,13 @@ function renderPublicHtml(list){
                 星期：${p.week}<br>
                 时段：${(p.times || []).join(' / ')}<br>
                 备注：${p.pub_txt || '无'}<br>
-                <button onclick="tryExchange()">申请交换联系方式</button>
+                <div class="match-count">匹配人数：${matchCount}</div>
+                <button onclick="createMatch(${p.id},'${p.user_id}')">申请匹配</button>
+                ${mutual ? `<div class="matched-contact">对方联系方式：${p.pri_txt}</div>` : ''}
             </div>
         </div>`;
-    });
+    }
     document.getElementById('publicSquare').innerHTML = html;
-}
-
-function tryExchange(){
-    alert("交换功能：双方都发布过帖子即可解锁");
 }
 
 async function showMyAndMatch(){
@@ -579,7 +644,9 @@ async function showMyAndMatch(){
         document.getElementById('myPostsList').innerHTML = "<p>你还没有发布</p>";
         return;
     }
-    data.forEach(p=>{
+
+    for(let p of data){
+        const matchCount = await getMatchCount(p.id);
         html += `
         <div class="my-post">
             <b>【${p.type}】${p.is_public?"公开":"私密"}</b><br>
@@ -588,13 +655,23 @@ async function showMyAndMatch(){
             星期：${p.week}<br>
             时段：${(p.times||[]).join(' / ')}<br>
             备注：${p.pub_txt || "无"}<br>
-            联系方式：${p.pri_txt || "未填写"}
+            联系方式：${p.pri_txt || "未填写"}<br>
+            <div class="match-count">已有 ${matchCount} 人申请匹配</div>
+            <button class="delete-btn" onclick="deletePost(${p.id})">删除该帖子</button>
         </div><hr>`;
-    });
+    }
     document.getElementById('myPostsList').innerHTML = html;
 }
 
-// 留言板 完整修复版
+async function deletePost(postId){
+    if(!confirm("确定删除？公开广场也会同步删除")) return;
+    await supabaseClient.from("posts").delete().eq("id", postId);
+    await supabaseClient.from("matches").delete().eq("post_id", postId);
+    alert("删除成功");
+    showMyAndMatch();
+}
+
+// 留言板
 async function postMsg(){
     let val = document.getElementById('msgInput').value.trim();
     if(!val)return;
