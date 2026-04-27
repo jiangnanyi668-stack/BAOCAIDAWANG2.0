@@ -237,8 +237,9 @@
     <button onclick="openTab(3)">饭搭子</button>
     <button onclick="openTab(4)">游戏搭子</button>
     <button onclick="openTab(5)">公开广场</button>
-    <button onclick="openTab(6)">我的发布</button>
-    <button onclick="openTab(7)">我的搭子</button>
+    <button onclick="openTab(6)">留言板</button>
+    <button onclick="openTab(7)">我的发布</button>
+    <button onclick="openTab(8)">我的搭子</button>
 </div>
 
 <div class="page show" id="page0">
@@ -275,7 +276,7 @@
     </select>
     <input type="text" id="r_date" placeholder="入住日期/备注（选填）">
     <textarea id="r_public" placeholder="公开可见：租房要求/位置/租期"></textarea>
-    <textarea id="r_private" placeholder="私密：联系方式（匹配后可见）"></textarea>
+    <textarea id="r_private" placeholder="私密联系方式"></textarea>
     <button onclick="postRent()">发布</button>
 </div>
 
@@ -339,7 +340,7 @@
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
     <textarea id="g_public" placeholder="组队要求"></textarea>
-    <textarea id="g_private" placeholder="联系方式"></textarea>
+    <textarea id="g_private" placeholder="私密联系方式"></textarea>
     <button onclick="postGame()">发布</button>
 </div>
 
@@ -362,11 +363,18 @@
 </div>
 
 <div class="page" id="page6">
+    <h3>匿名留言板</h3>
+    <textarea id="msgInput" placeholder="写下你想说的..."></textarea>
+    <button onclick="postMsg()">发布匿名帖子</button>
+    <div id="msgList"></div>
+</div>
+
+<div class="page" id="page7">
     <h3>我的发布</h3>
     <div id="myPostsList"></div>
 </div>
 
-<div class="page" id="page7">
+<div class="page" id="page8">
     <h3>我的搭子</h3>
     <div id="myBuddiesList"></div>
 </div>
@@ -408,8 +416,9 @@ function openTab(idx){
     document.querySelectorAll('.nav button')[idx].classList.add('active');
     currentTab = idx;
     if(idx===5) loadPublicSquare();
-    if(idx===6) showMyPosts();
-    if(idx===7) showMyBuddies();
+    if(idx===6) loadMsg();
+    if(idx===7) showMyPosts();
+    if(idx===8) showMyBuddies();
 }
 
 function selTime(btn){
@@ -433,7 +442,7 @@ function postClass(){
 function postSport(){
     const d = {
         type:document.getElementById('s_type').value, date:document.getElementById('s_date').value,
-        week:document.getElementById('s_week').value, times:getTimes("#page1"),
+        week:document.getElementById('s_week').value, times:getTimes("#page2"),
         pubTxt:document.getElementById('s_public').value, priTxt:document.getElementById('s_private').value
     };
     saveBuddy("运动搭子", d);
@@ -441,7 +450,7 @@ function postSport(){
 function postMeal(){
     const d = {
         type:document.getElementById('f_type').value, date:document.getElementById('f_date').value,
-        week:document.getElementById('f_week').value, times:getTimes("#page2"),
+        week:document.getElementById('f_week').value, times:getTimes("#page3"),
         pubTxt:document.getElementById('f_public').value, priTxt:document.getElementById('f_private').value
     };
     saveBuddy("饭搭子", d);
@@ -449,7 +458,7 @@ function postMeal(){
 function postGame(){
     const d = {
         type:document.getElementById('g_type').value, date:document.getElementById('g_date').value,
-        week:document.getElementById('g_week').value, times:getTimes("#page3"),
+        week:document.getElementById('g_week').value, times:getTimes("#page4"),
         pubTxt:document.getElementById('g_public').value, priTxt:document.getElementById('g_private').value
     };
     saveBuddy("游戏搭子", d);
@@ -475,7 +484,7 @@ async function saveBuddy(type,data){
     const { error } = await supabaseClient.from("posts").insert([po]);
     if(error) return alert("发布失败："+error.message);
     alert("发布成功！");
-    openTab(6);
+    openTab(7);
 }
 
 async function getDailyApplyCount(){
@@ -646,6 +655,67 @@ async function showMyBuddies(){
     }
     document.getElementById('myBuddiesList').innerHTML=h;
 }
+
+async function postMsg(){
+    const v=document.getElementById('msgInput').value.trim();
+    if(!v)return;
+    await supabaseClient.from("messages").insert([{user_id:userId,content:v,parent_id:null}]);
+    document.getElementById('msgInput').value=""; loadMsg();
+}
+async function postReply(pid,c){
+    if(!c.trim())return;
+    await supabaseClient.from("messages").insert([{user_id:userId,content:c,parent_id:pid}]);
+    loadMsg();
+}
+async function loadMsg(){
+    const {data:all} = await supabaseClient.from("messages").select("*").order("created_at",{ascending:false});
+    if(!all||all.length===0) return document.getElementById('msgList').innerHTML="<p>暂无留言</p>";
+    const main=all.filter(m=>m.parent_id===null);
+    const rep=all.filter(m=>m.parent_id!==null);
+    const map={}; rep.forEach(r=>{if(!map[r.parent_id])map[r.parent_id]=[];map[r.parent_id].push(r);});
+    let h="";const now=Date.now();
+    main.forEach(m=>{
+        const old=now-new Date(m.created_at).getTime()>THREE_MONTH;
+        const rs=map[m.id]||[];
+        const vis=rs.length>3?rs.slice(-3):rs;
+        const hide=rs.length-vis.length;
+        h+=`
+        <div class="msg-item ${old?'old-msg-wrap':''}">
+            <div class="msg-header">
+                <div class="avatar">板</div>
+                <div class="msg-content">
+                    <p ${old?'style="display:none"':''}>${m.content}</p>
+                    ${old?'<button class="fold-btn" onclick="toggleHide(this)">展开</button>':''}
+                    <button class="reply-btn" onclick="toggleReplyBox(${m.id})">回复</button>
+                </div>
+            </div>
+            <div class="reply-list">
+                ${hide>0?`<div class="fold-btn">折叠${hide}条</div>`:''}
+                ${vis.map(r=>`<div class="reply-item">→ ${r.content}</div>`).join('')}
+            </div>
+            <div id="replyBox${m.id}" style="display:none;padding-left:54px;">
+                <input class="reply-input" id="rt${m.id}">
+                <button class="reply-submit" onclick="sendReply(${m.id})">发送</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('msgList').innerHTML=h;
+}
+function toggleReplyBox(id){
+    const b=document.getElementById("replyBox"+id);
+    b.style.display=b.style.display==="none"?"block":"none";
+}
+async function sendReply(id){
+    const t=document.getElementById("rt"+id).value;
+    await postReply(id,t);
+}
+function toggleHide(b){
+    const p=b.previousElementSibling;
+    if(p.style.display==="none"){p.style.display="block";b.innerText="折叠";}
+    else{p.style.display="none";b.innerText="展开";}
+}
+
+loadMsg();
 </script>
 </body>
 </html>
