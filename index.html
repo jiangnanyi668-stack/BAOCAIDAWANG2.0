@@ -15,6 +15,7 @@
             --color-sport: #B0C4B3;
             --color-meal: #C9B9B3;
             --color-game: #A1B8C4;
+            --color-rent: #B0A0C0;
             --color-msg: #97ABB1;
             --color-reply: #BCB9C9;
         }
@@ -30,8 +31,8 @@
         }
         .site-title{
             font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            font-weight:bold;
+            letter-spacing:0.5px;
         }
 
         .nav{
@@ -120,7 +121,6 @@
             background:var(--uci-gold);
             color:#000;
         }
-        .exchange-btn{background:var(--uci-blue);}
         .fold-btn {color:#666;font-size:14px;cursor:pointer;margin:4px 0;}
 
         .avatar{
@@ -142,69 +142,30 @@
             background:#f9f9f9;
             border-radius:12px;
             margin:12px 0;
-            flex-direction: column;
+            flex-direction:column;
         }
-        .msg-header {
-            display:flex;
-            gap:12px;
-            align-items:flex-start;
-        }
+        .msg-header {display:flex;gap:12px;align-items:flex-start;}
         .msg-content {flex:1;}
-        .reply-list {margin-top:10px; padding-left: 54px;}
+        .reply-list {margin-top:10px;padding-left:54px;}
         .reply-item {
-            display:flex;
-            gap:8px;
-            padding:6px 0;
-            margin-left:0;
-            font-size:14px;
-            color:#555;
+            display:flex;gap:8px;padding:6px 0;margin-left:0;font-size:14px;color:#555;
         }
         .reply-btn {
-            font-size:13px;
-            color:var(--uci-blue);
-            background:none;
-            border:none;
-            cursor:pointer;
-            padding:0;
-            margin-top:4px;
-        }
-        .reply-input-container {
-            margin-top:10px;
-            padding-left: 54px;
+            font-size:13px;color:var(--uci-blue);background:none;border:none;cursor:pointer;padding:0;margin-top:4px;
         }
         .reply-input {
-            width:100%;
-            padding:8px;
-            border-radius:4px;
-            border:1px solid #ddd;
-            font-size:14px;
+            width:100%;padding:8px;border-radius:4px;border:1px solid #ddd;font-size:14px;
         }
-        .reply-submit {
-            margin-top:4px;
-            font-size:13px;
-            padding:6px 12px;
-        }
+        .reply-submit {margin-top:4px;font-size:13px;padding:6px 12px;}
 
         .modal{
-            position:fixed;
-            top:0;left:0;
-            width:100%;height:100%;
-            background:rgba(0,0,0,0.5);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            z-index:9999;
+            position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);
+            display:flex;align-items:center;justify-content:center;z-index:9999;
         }
-        .modal-box{
-            background:white;
-            padding:30px;
-            border-radius:12px;
-            max-width:580px;
-            width:90%;
-            line-height:1.7;
-        }
+        .modal-box{background:white;padding:30px;border-radius:12px;max-width:580px;width:90%;line-height:1.7;}
 
         .my-post,.public-card{
+            position:relative;
             padding:16px;
             border-radius:10px;
             margin:10px 0;
@@ -217,22 +178,22 @@
         .old-msg-wrap{background:#f1f1f1;opacity:0.9;}
 
         .match-count{
-            color: #00558c;
-            font-size:14px;
-            font-weight:bold;
-            margin:4px 0;
+            color:#00558c;font-size:14px;font-weight:bold;margin:4px 0;
         }
         .delete-btn{
+            position:absolute;
+            top:8px;
+            right:8px;
             background:#e53935;
-            padding:6px 12px;
-            font-size:14px;
-            margin-top:8px;
+            font-size:10px;
+            padding:2px 6px;
+            border-radius:4px;
+            cursor:pointer;
+            border:none;
+            color:white;
         }
         .matched-contact{
-            color:#0277bd;
-            font-weight:bold;
-            margin-top:6px;
-            font-size:15px;
+            color:#0277bd;font-weight:bold;margin-top:6px;font-size:15px;
         }
     </style>
 </head>
@@ -241,13 +202,12 @@
 <div class="modal" id="noticeModal">
     <div class="modal-box">
         <h3>网站使用公告 & 发帖规则</h3>
-        <p>1. 课友/运动/饭搭/游戏/公开广场五大模块：每半年统一清空数据（周期：1–5月、6–12月）</p>
-        <p>2. 匿名留言板：每半年自动清空，周期：1–5月、6–12月</p>
-        <p>3. 留言板规则：回复超3条自动折叠最早内容；发布满3个月整条留言自动折叠</p>
-        <p>4. 公开广场：发布超过3个月的帖子自动折叠，可点击展开查看；支持多条件标签筛选</p>
-        <p>5. 帖子分为公开/私密：公开帖展示基础信息，联系方式需双向解锁</p>
-        <p>6. 交换联系方式条件：账号至少发布过1条有效帖子</p>
-        <p>7. 请勿泄露隐私信息，线下见面谨慎辨别，禁止发布违规内容</p>
+        <p>1. 课友/运动/饭搭/游戏/租房/公开广场：每半年统一清空数据（1–5月、6–12月）</p>
+        <p>2. 匿名留言板：每半年自动清空</p>
+        <p>3. 回复超3条自动折叠；发布满3个月自动折叠</p>
+        <p>4. 公开广场支持全分类筛选</p>
+        <p>5. 联系方式需双向匹配解锁</p>
+        <p>6. 禁止违规内容，线下注意安全</p>
         <button onclick="closeModal()">我已阅读并遵守</button>
     </div>
 </div>
@@ -261,16 +221,17 @@
     <button onclick="openTab(1)">运动搭子</button>
     <button onclick="openTab(2)">饭搭子</button>
     <button onclick="openTab(3)">游戏搭子</button>
-    <button onclick="openTab(4)">公开广场</button>
-    <button onclick="openTab(5)">留言板</button>
-    <button onclick="openTab(6)">我的发布</button>
+    <button onclick="openTab(4)">租房</button>
+    <button onclick="openTab(5)">公开广场</button>
+    <button onclick="openTab(6)">留言板</button>
+    <button onclick="openTab(7)">我的发布</button>
 </div>
 
 <div class="page show" id="page0">
     <h3>发布课友信息</h3>
     <input type="text" id="c_code" placeholder="课程编码">
     <input type="text" id="c_name" placeholder="课程名称（选填）">
-    <input type="text" id="c_date" placeholder="日期（选填 例：2026.04.25）">
+    <input type="text" id="c_date" placeholder="日期（选填）">
     <select id="c_week">
         <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
     </select>
@@ -341,7 +302,7 @@
     <h3>发布游戏搭子</h3>
     <select id="g_type">
         <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option><option>CS2</option>
-        <option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option><option>和平精英</option><option>永劫无间</option><option>金铲铲之战</option><option>守望先锋</option><option>崩坏：星穹铁道</option><option>其他</option>
+        <option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option><option>和平精英</option><option>永劫无间</option>
     </select>
     <input type="text" id="g_date" placeholder="日期（选填）">
     <select id="g_week">
@@ -354,7 +315,7 @@
         <button class="time-btn" onclick="selTime(this)">16:00-19:00</button>
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
-    <textarea id="g_public" placeholder="游戏习惯/组队要求"></textarea>
+    <textarea id="g_public" placeholder="组队要求"></textarea>
     <textarea id="g_private" placeholder="联系方式"></textarea>
     <div class="btn-group">
         <button onclick="postGame()">提交发布</button>
@@ -362,32 +323,39 @@
     </div>
 </div>
 
+<!-- ######################## 租房模块 ######################## -->
 <div class="page" id="page4">
+    <h3>发布租房信息</h3>
+    <select id="r_gender">
+        <option>男生</option><option>女生</option><option>不限</option>
+    </select>
+    <select id="r_grade">
+        <option>大一</option><option>大二</option><option>大三</option><option>大四</option><option>研究生</option>
+    </select>
+    <select id="r_house">
+        <option>2b1b</option><option>2b2b</option><option>3b2b</option><option>3b3b</option>
+        <option>4b2b</option><option>4b3b</option><option>4b4b</option><option>其他</option>
+    </select>
+    <input type="text" id="r_date" placeholder="入住日期/备注（选填）">
+    <textarea id="r_public" placeholder="公开可见：租房要求/位置/租期"></textarea>
+    <textarea id="r_private" placeholder="私密：联系方式（匹配后可见）"></textarea>
+    <button onclick="postRent()">发布到公开广场</button>
+</div>
+
+<div class="page" id="page5">
     <h3>公开帖子广场</h3>
     <div class="filter-wrap">
         <select id="filterType">
             <option value="">全部分类</option>
-            <option>课友</option>
-            <option>运动搭子</option>
-            <option>饭搭子</option>
-            <option>游戏搭子</option>
+            <option>课友</option><option>运动搭子</option><option>饭搭子</option><option>游戏搭子</option><option>租房</option>
         </select>
         <select id="filterTime">
             <option value="">全部时段</option>
-            <option>07:00-10:00</option>
-            <option>10:00-13:00</option>
-            <option>13:00-16:00</option>
-            <option>16:00-19:00</option>
-            <option>19:00-22:00</option>
+            <option>07:00-10:00</option><option>10:00-13:00</option><option>13:00-16:00</option>
+            <option>16:00-19:00</option><option>19:00-22:00</option>
         </select>
         <select id="filterTag">
             <option value="">全部标签</option>
-            <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option>
-            <option>中餐</option><option>韩餐</option><option>日料</option><option>奶茶</option><option>食堂</option>
-            <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option>
-            <option>CS2</option><option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option>
-            <option>和平精英</option><option>永劫无间</option><option>金铲铲之战</option><option>守望先锋</option>
-            <option>崩坏：星穹铁道</option><option>其他</option>
         </select>
         <button onclick="filterPublicPost()">筛选</button>
         <button class="btn-gold" onclick="resetFilter()">重置</button>
@@ -395,15 +363,15 @@
     <div id="publicSquare"></div>
 </div>
 
-<div class="page" id="page5">
+<div class="page" id="page6">
     <h3>匿名留言板</h3>
     <textarea id="msgInput" placeholder="写下你想说的..."></textarea>
     <button onclick="postMsg()">发布匿名帖子</button>
     <div id="msgList"></div>
 </div>
 
-<div class="page" id="page6">
-    <h3>我的发布 & 匹配记录</h3>
+<div class="page" id="page7">
+    <h3>我的发布 & 匹配</h3>
     <div id="myPostsList"></div>
 </div>
 
@@ -422,21 +390,20 @@ if (!userId) {
 let currentTab = 0;
 const THREE_MONTH = 7776000000;
 
-// 匹配表（新增）
+// ------------------------------ 匹配逻辑（修复双向可见）
 async function createMatch(postId, targetUserId) {
     const { data: exists } = await supabaseClient
         .from("matches")
         .select("*")
         .eq("from_user", userId)
         .eq("post_id", postId)
-        .single();
-
-    if (exists) return alert("你已经申请过匹配");
+        .maybeSingle();
+    if (exists) return alert("已申请过匹配");
 
     await supabaseClient.from("matches").insert([
         { from_user: userId, to_user: targetUserId, post_id: postId }
     ]);
-    alert("匹配申请成功！双方互关后自动解锁联系方式");
+    alert("申请成功！对方同意后可查看联系方式");
 }
 
 async function getMatchCount(postId) {
@@ -447,25 +414,25 @@ async function getMatchCount(postId) {
     return count || 0;
 }
 
-async function isMutualMatch(postUserId, postId) {
-    const { data: meToThem } = await supabaseClient
+async function isMutualMatch(postOwnerId, postId) {
+    const { data: meToOwner } = await supabaseClient
         .from("matches")
         .select("*")
         .eq("from_user", userId)
         .eq("post_id", postId)
-        .single();
+        .maybeSingle();
 
-    const { data: themToMe } = await supabaseClient
+    const { data: ownerToMe } = await supabaseClient
         .from("matches")
         .select("*")
-        .eq("from_user", postUserId)
-        .eq("from_user", postUserId)
-        .single();
+        .eq("from_user", postOwnerId)
+        .eq("to_user", userId)
+        .maybeSingle();
 
-    return !!(meToThem && themToMe);
+    return !!(meToOwner && ownerToMe);
 }
 
-// 关闭公告
+// ------------------------------ 基础
 function closeModal() {
     document.getElementById('noticeModal').style.display = 'none';
 }
@@ -476,6 +443,7 @@ function getAvatarColor(type){
     if(type.includes("运动")) return 'var(--color-sport)';
     if(type.includes("饭搭")) return 'var(--color-meal)';
     if(type.includes("游戏")) return 'var(--color-game)';
+    if(type.includes("租房")) return 'var(--color-rent)';
     return 'var(--color-msg)';
 }
 
@@ -485,28 +453,22 @@ function openTab(idx){
     document.getElementById('page'+idx).classList.add('show');
     document.querySelectorAll('.nav button')[idx].classList.add('active');
     currentTab = idx;
-    if(idx===4) loadPublicSquare();
-    if(idx===5) loadMsg();
-    if(idx===6) showMyAndMatch();
+    if(idx===5) loadPublicSquare();
+    if(idx===6) loadMsg();
+    if(idx===7) showMyAndMatch();
 }
 
 function selTime(btn){
     const wrap = btn.parentElement;
-    const selected = wrap.querySelectorAll('.selected');
-    if(btn.classList.contains('selected')){
-        btn.classList.remove('selected');
-    }else{
-        if(selected.length>=2) return alert('最多选择2个时间段');
-        btn.classList.add('selected');
-    }
+    const s = wrap.querySelectorAll('.selected');
+    if(btn.classList.contains('selected')) btn.classList.remove('selected');
+    else { if(s.length>=2) return alert("最多2个时段"); btn.classList.add('selected'); }
+}
+function getTimes(w){
+    let a=[]; document.querySelectorAll(w+' .selected').forEach(b=>a.push(b.innerText)); return a;
 }
 
-function getTimes(wrapSel){
-    let arr=[];
-    document.querySelectorAll(wrapSel+' .time-btn.selected').forEach(b=>arr.push(b.innerText));
-    return arr;
-}
-
+// ------------------------------ 发布
 function postClass(){saveBuddy("课友",getClassData(),false);}
 function postClassPublic(){saveBuddy("课友",getClassData(),true);}
 function postSport(){saveBuddy("运动搭子",getSportData(),false);}
@@ -516,261 +478,192 @@ function postMealPublic(){saveBuddy("饭搭子",getMealData(),true);}
 function postGame(){saveBuddy("游戏搭子",getGameData(),false);}
 function postGamePublic(){saveBuddy("游戏搭子",getGameData(),true);}
 
+// 租房发布
+function postRent(){
+    const d = {
+        gender: document.getElementById('r_gender').value,
+        grade: document.getElementById('r_grade').value,
+        house: document.getElementById('r_house').value,
+        date: document.getElementById('r_date').value,
+        pubTxt: document.getElementById('r_public').value,
+        priTxt: document.getElementById('r_private').value
+    };
+    saveBuddy("租房", d, true);
+}
+
 function getClassData(){
     return {
-        code:document.getElementById('c_code').value,
-        name:document.getElementById('c_name').value,
-        date:document.getElementById('c_date').value,
-        week:document.getElementById('c_week').value,
-        times:getTimes("#page0"),
-        pubTxt:document.getElementById('c_public').value,
-        priTxt:document.getElementById('c_private').value
+        code:document.getElementById('c_code').value, name:document.getElementById('c_name').value,
+        date:document.getElementById('c_date').value, week:document.getElementById('c_week').value,
+        times:getTimes("#page0"), pubTxt:document.getElementById('c_public').value, priTxt:document.getElementById('c_private').value
     }
 }
-
 function getSportData(){
     return {
-        type:document.getElementById('s_type').value,
-        date:document.getElementById('s_date').value,
-        week:document.getElementById('s_week').value,
-        times:getTimes("#page1"),
-        pubTxt:document.getElementById('s_public').value,
-        priTxt:document.getElementById('s_private').value
+        type:document.getElementById('s_type').value, date:document.getElementById('s_date').value,
+        week:document.getElementById('s_week').value, times:getTimes("#page1"),
+        pubTxt:document.getElementById('s_public').value, priTxt:document.getElementById('s_private').value
     }
 }
-
 function getMealData(){
     return {
-        type:document.getElementById('f_type').value,
-        date:document.getElementById('f_date').value,
-        week:document.getElementById('f_week').value,
-        times:getTimes("#page2"),
-        pubTxt:document.getElementById('f_public').value,
-        priTxt:document.getElementById('f_private').value
+        type:document.getElementById('f_type').value, date:document.getElementById('f_date').value,
+        week:document.getElementById('f_week').value, times:getTimes("#page2"),
+        pubTxt:document.getElementById('f_public').value, priTxt:document.getElementById('f_private').value
     }
 }
-
 function getGameData(){
     return {
-        type:document.getElementById('g_type').value,
-        date:document.getElementById('g_date').value,
-        week:document.getElementById('g_week').value,
-        times:getTimes("#page3"),
-        pubTxt:document.getElementById('g_public').value,
-        priTxt:document.getElementById('g_private').value
+        type:document.getElementById('g_type').value, date:document.getElementById('g_date').value,
+        week:document.getElementById('g_week').value, times:getTimes("#page3"),
+        pubTxt:document.getElementById('g_public').value, priTxt:document.getElementById('g_private').value
     }
 }
 
 async function saveBuddy(type,data,isPublic){
-    const postObj = {
-        user_id: userId,
-        type: type,
-        tag: data.type || "",
-        week: data.week,
-        times: data.times,
-        date: data.date || "",
-        pub_txt: data.pubTxt || "",
-        pri_txt: data.priTxt || "",
-        is_public: isPublic
+    const po = {
+        user_id:userId, type:type, tag: data.type || data.gender || "",
+        week:data.week||"", times:data.times||[], date:data.date||"",
+        pub_txt:data.pubTxt||"", pri_txt:data.priTxt||"", is_public:isPublic
     };
-
-    const { error } = await supabaseClient.from("posts").insert([postObj]);
-    if (error) {
-        alert("发布失败：" + error.message);
-        return;
-    }
+    const { error } = await supabaseClient.from("posts").insert([po]);
+    if(error) return alert("发布失败："+error.message);
     alert("发布成功！");
-    openTab(6);
+    openTab(7);
 }
 
+// ------------------------------ 公开广场
 async function loadPublicSquare(){
-    const { data, error } = await supabaseClient
-        .from("posts")
-        .select("*")
-        .eq("is_public", true)
-        .order("created_at", { ascending: false });
-
-    renderPublicHtml(data || []);
+    const { data } = await supabaseClient
+        .from("posts").select("*").eq("is_public",true).order("created_at",{ascending:false});
+    renderPublicHtml(data||[]);
 }
-
-function filterPublicPost(){
-    loadPublicSquare();
-}
+function filterPublicPost(){loadPublicSquare();}
 function resetFilter(){
-    document.getElementById('filterType').value = "";
-    document.getElementById('filterTime').value = "";
-    document.getElementById('filterTag').value = "";
+    document.getElementById('filterType').value="";
+    document.getElementById('filterTime').value="";
+    document.getElementById('filterTag').value="";
     loadPublicSquare();
 }
 
 async function renderPublicHtml(list){
-    let html='';
-    const now = Date.now();
-    if(!list || list.length===0) return document.getElementById('publicSquare').innerHTML="<p>暂无公开帖子</p>";
-
-    for (let p of list) {
-        const matchCount = await getMatchCount(p.id);
-        const mutual = await isMutualMatch(p.user_id, p.id);
-        const isOld = (new Date(p.created_at).getTime() < now - THREE_MONTH);
-
-        html += `
-        <div class="public-card ${isOld?'old-msg-wrap':''}">
-            <div class="avatar" style="background:${getAvatarColor(p.type)}">匿</div>
+    let h=""; const now=Date.now();
+    if(!list||list.length===0) return document.getElementById('publicSquare').innerHTML="<p>暂无公开</p>";
+    for(let p of list){
+        const mc = await getMatchCount(p.id);
+        const mut = await isMutualMatch(p.user_id,p.id);
+        const old = new Date(p.created_at).getTime() < now-THREE_MONTH;
+        h+=`
+        <div class="public-card ${old?'old-msg-wrap':''}">
+            <div class="avatar" style="${getAvatarColor(p.type)}">匿</div>
             <div class="public-info">
                 <b>${p.type}</b><br>
-                标签：${p.tag || '无'}<br>
-                日期：${p.date || '未填写'}<br>
-                星期：${p.week}<br>
-                时段：${(p.times || []).join(' / ')}<br>
-                备注：${p.pub_txt || '无'}<br>
-                <div class="match-count">匹配人数：${matchCount}</div>
+                标签：${p.tag||'无'}<br>
+                日期：${p.date||'无'}<br>
+                星期：${p.week||'无'}<br>
+                时段：${(p.times||[]).join(' / ')}<br>
+                备注：${p.pub_txt||'无'}<br>
+                <div class="match-count">匹配：${mc}人</div>
                 <button onclick="createMatch(${p.id},'${p.user_id}')">申请匹配</button>
-                ${mutual ? `<div class="matched-contact">对方联系方式：${p.pri_txt}</div>` : ''}
+                ${mut?`<div class="matched-contact">对方联系方式：${p.pri_txt}</div>`:''}
             </div>
         </div>`;
     }
-    document.getElementById('publicSquare').innerHTML = html;
+    document.getElementById('publicSquare').innerHTML=h;
 }
 
+// ------------------------------ 我的发布 + 删除按钮
 async function showMyAndMatch(){
     const { data } = await supabaseClient
-        .from("posts")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-
-    let html = "";
-    if (!data || data.length === 0) {
-        document.getElementById('myPostsList').innerHTML = "<p>你还没有发布</p>";
-        return;
-    }
-
+        .from("posts").select("*").eq("user_id",userId).order("created_at",{ascending:false});
+    let h="";
+    if(!data||data.length===0) return document.getElementById('myPostsList').innerHTML="<p>无发布</p>";
     for(let p of data){
-        const matchCount = await getMatchCount(p.id);
-        html += `
+        const mc = await getMatchCount(p.id);
+        h+=`
         <div class="my-post">
-            <b>【${p.type}】${p.is_public?"公开":"私密"}</b><br>
-            标签：${p.tag || "无"}<br>
-            日期：${p.date || "无"}<br>
-            星期：${p.week}<br>
+            <button class="delete-btn" onclick="deletePost(${p.id})">删除</button>
+            <b>【${p.type}】${p.is_public?'公开':'私密'}</b><br>
+            标签：${p.tag||'无'}<br>
+            日期：${p.date||'无'}<br>
+            星期：${p.week||'无'}<br>
             时段：${(p.times||[]).join(' / ')}<br>
-            备注：${p.pub_txt || "无"}<br>
-            联系方式：${p.pri_txt || "未填写"}<br>
-            <div class="match-count">已有 ${matchCount} 人申请匹配</div>
-            <button class="delete-btn" onclick="deletePost(${p.id})">删除该帖子</button>
+            备注：${p.pub_txt||'无'}<br>
+            联系方式：${p.pri_txt||'未填写'}<br>
+            <div class="match-count">申请匹配：${mc}人</div>
         </div><hr>`;
     }
-    document.getElementById('myPostsList').innerHTML = html;
+    document.getElementById('myPostsList').innerHTML=h;
 }
 
-async function deletePost(postId){
-    if(!confirm("确定删除？公开广场也会同步删除")) return;
-    await supabaseClient.from("posts").delete().eq("id", postId);
-    await supabaseClient.from("matches").delete().eq("post_id", postId);
-    alert("删除成功");
+async function deletePost(pid){
+    if(!confirm("确认删除？")) return;
+    await supabaseClient.from("posts").delete().eq("id",pid);
+    await supabaseClient.from("matches").delete().eq("post_id",pid);
+    alert("已删除");
     showMyAndMatch();
 }
 
-// 留言板
+// ------------------------------ 留言板
 async function postMsg(){
-    let val = document.getElementById('msgInput').value.trim();
-    if(!val)return;
-    await supabaseClient.from("messages").insert([
-        { user_id: userId, content: val, parent_id: null }
-    ]);
-    document.getElementById('msgInput').value = "";
+    const v=document.getElementById('msgInput').value.trim();
+    if(!v)return;
+    await supabaseClient.from("messages").insert([{user_id:userId,content:v,parent_id:null}]);
+    document.getElementById('msgInput').value=""; loadMsg();
+}
+async function postReply(pid,c){
+    if(!c.trim())return;
+    await supabaseClient.from("messages").insert([{user_id:userId,content:c,parent_id:pid}]);
     loadMsg();
 }
-
-async function postReply(parentId, content){
-    if(!content.trim()) return;
-    await supabaseClient.from("messages").insert([
-        { user_id: userId, content: content, parent_id: parentId }
-    ]);
-    loadMsg();
-}
-
 async function loadMsg(){
-    const { data: allMessages } = await supabaseClient
-        .from("messages")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (!allMessages || allMessages.length === 0) {
-        document.getElementById('msgList').innerHTML = "<p>暂无留言</p>";
-        return;
-    }
-
-    const mainMessages = allMessages.filter(m => m.parent_id === null);
-    const replies = allMessages.filter(m => m.parent_id !== null);
-    const replyMap = {};
-    replies.forEach(r => {
-        if (!replyMap[r.parent_id]) replyMap[r.parent_id] = [];
-        replyMap[r.parent_id].push(r);
-    });
-
-    let html = "";
-    const now = Date.now();
-
-    mainMessages.forEach(m => {
-        const msgTime = new Date(m.created_at).getTime();
-        const isExpired = (now - msgTime) > THREE_MONTH;
-        const repliesForMsg = replyMap[m.id] || [];
-        const totalReplies = repliesForMsg.length;
-        const visibleReplies = totalReplies > 3 ? repliesForMsg.slice(-3) : repliesForMsg;
-        const hiddenCount = totalReplies - visibleReplies.length;
-
-        html += `
-        <div class="msg-item ${isExpired ? 'old-msg-wrap' : ''}">
+    const {data:all} = await supabaseClient.from("messages").select("*").order("created_at",{ascending:false});
+    if(!all||all.length===0) return document.getElementById('msgList').innerHTML="<p>暂无留言</p>";
+    const main=all.filter(m=>m.parent_id===null);
+    const rep=all.filter(m=>m.parent_id!==null);
+    const map={}; rep.forEach(r=>{if(!map[r.parent_id])map[r.parent_id]=[];map[r.parent_id].push(r);});
+    let h="";const now=Date.now();
+    main.forEach(m=>{
+        const old=now-new Date(m.created_at).getTime()>THREE_MONTH;
+        const rs=map[m.id]||[];
+        const vis=rs.length>3?rs.slice(-3):rs;
+        const hide=rs.length-vis.length;
+        h+=`
+        <div class="msg-item ${old?'old-msg-wrap':''}">
             <div class="msg-header">
                 <div class="avatar">板</div>
                 <div class="msg-content">
-                    <p class="msg-text" ${isExpired?'style="display:none"':''}>${m.content}</p>
-                    ${isExpired ? `<button class="fold-btn" onclick="toggleHide(this)">点击展开查看</button>` : ''}
+                    <p ${old?'style="display:none"':''}>${m.content}</p>
+                    ${old?'<button class="fold-btn" onclick="toggleHide(this)">展开</button>':''}
                     <button class="reply-btn" onclick="toggleReplyBox(${m.id})">回复</button>
                 </div>
             </div>
-            <div class="reply-list">`;
-
-        if(hiddenCount > 0){
-            html += `<button class="fold-btn" onclick="alert('刷新显示全部')">折叠了${hiddenCount}条早期回复</button>`;
-        }
-        visibleReplies.forEach(r=>{
-            html += `<div class="reply-item">→ ${r.content}</div>`;
-        });
-
-        html += `
+            <div class="reply-list">
+                ${hide>0?`<div class="fold-btn">折叠${hide}条</div>`:''}
+                ${vis.map(r=>`<div class="reply-item">→ ${r.content}</div>`).join('')}
             </div>
             <div id="replyBox${m.id}" style="display:none;padding-left:54px;">
-                <input class="reply-input" id="replyTxt${m.id}" placeholder="输入回复内容">
-                <button class="reply-submit" onclick="sendReply(${m.id})">发送回复</button>
+                <input class="reply-input" id="rt${m.id}">
+                <button class="reply-submit" onclick="sendReply(${m.id})">发送</button>
             </div>
         </div>`;
     });
-
-    document.getElementById('msgList').innerHTML = html;
+    document.getElementById('msgList').innerHTML=h;
 }
-
 function toggleReplyBox(id){
-    const box = document.getElementById("replyBox"+id);
-    box.style.display = box.style.display === "none" ? "block" : "none";
+    const b=document.getElementById("replyBox"+id);
+    b.style.display=b.style.display==="none"?"block":"none";
 }
 async function sendReply(id){
-    const txt = document.getElementById("replyTxt"+id).value;
-    await postReply(id,txt);
+    const t=document.getElementById("rt"+id).value;
+    await postReply(id,t);
 }
-function toggleHide(btn){
-    const p = btn.previousElementSibling;
-    if(p.style.display==="none"){
-        p.style.display="block";
-        btn.innerText="点击折叠";
-    }else{
-        p.style.display="none";
-        btn.innerText="点击展开查看";
-    }
+function toggleHide(b){
+    const p=b.previousElementSibling;
+    if(p.style.display==="none"){p.style.display="block";b.innerText="折叠";}
+    else{p.style.display="none";b.innerText="展开";}
 }
 
-// 初始化
 loadMsg();
 </script>
 </body>
