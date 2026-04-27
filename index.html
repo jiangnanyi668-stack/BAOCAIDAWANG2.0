@@ -201,7 +201,7 @@
 
 <div class="modal" id="noticeModal">
     <div class="modal-box">
-        <h3>网站使用公告 & 发帖规则</h3>
+        <h3>UCI 网站使用公告 & 发帖规则</h3>
         <p>1. 课友/运动/饭搭/游戏/租房/公开广场：每半年统一清空数据（1–5月、6–12月）</p>
         <p>2. 匿名留言板：每半年自动清空</p>
         <p>3. 回复超3条自动折叠；发布满3个月自动折叠</p>
@@ -228,7 +228,7 @@
 </div>
 
 <div class="page show" id="page0">
-    <h3>发布课友信息</h3>
+    <h3>UCI 发布课友信息</h3>
     <input type="text" id="c_code" placeholder="课程编码">
     <input type="text" id="c_name" placeholder="课程名称（选填）">
     <input type="text" id="c_date" placeholder="日期（选填）">
@@ -251,7 +251,7 @@
 </div>
 
 <div class="page" id="page1">
-    <h3>发布运动搭子</h3>
+    <h3>UCI 发布运动搭子</h3>
     <select id="s_type">
         <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option><option>其他</option>
     </select>
@@ -275,7 +275,7 @@
 </div>
 
 <div class="page" id="page2">
-    <h3>发布饭搭子</h3>
+    <h3>UCI 发布饭搭子</h3>
     <select id="f_type">
         <option>中餐</option><option>韩餐</option><option>日料</option><option>奶茶</option><option>食堂</option><option>其他</option>
     </select>
@@ -299,7 +299,7 @@
 </div>
 
 <div class="page" id="page3">
-    <h3>发布游戏搭子</h3>
+    <h3>UCI 发布游戏搭子</h3>
     <select id="g_type">
         <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option><option>CS2</option>
         <option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option><option>和平精英</option><option>永劫无间</option>
@@ -323,9 +323,8 @@
     </div>
 </div>
 
-<!-- ######################## 租房模块 ######################## -->
 <div class="page" id="page4">
-    <h3>发布租房信息</h3>
+    <h3>UCI 发布租房信息</h3>
     <select id="r_gender">
         <option>男生</option><option>女生</option><option>不限</option>
     </select>
@@ -343,7 +342,7 @@
 </div>
 
 <div class="page" id="page5">
-    <h3>公开帖子广场</h3>
+    <h3>UCI 公开帖子广场</h3>
     <div class="filter-wrap">
         <select id="filterType">
             <option value="">全部分类</option>
@@ -364,14 +363,14 @@
 </div>
 
 <div class="page" id="page6">
-    <h3>匿名留言板</h3>
+    <h3>UCI 匿名留言板</h3>
     <textarea id="msgInput" placeholder="写下你想说的..."></textarea>
     <button onclick="postMsg()">发布匿名帖子</button>
     <div id="msgList"></div>
 </div>
 
 <div class="page" id="page7">
-    <h3>我的发布 & 匹配</h3>
+    <h3>UCI 我的发布 & 匹配</h3>
     <div id="myPostsList"></div>
 </div>
 
@@ -390,7 +389,6 @@ if (!userId) {
 let currentTab = 0;
 const THREE_MONTH = 7776000000;
 
-// ------------------------------ 匹配逻辑（修复双向可见）
 async function createMatch(postId, targetUserId) {
     const { data: exists } = await supabaseClient
         .from("matches")
@@ -432,7 +430,6 @@ async function isMutualMatch(postOwnerId, postId) {
     return !!(meToOwner && ownerToMe);
 }
 
-// ------------------------------ 基础
 function closeModal() {
     document.getElementById('noticeModal').style.display = 'none';
 }
@@ -468,7 +465,6 @@ function getTimes(w){
     let a=[]; document.querySelectorAll(w+' .selected').forEach(b=>a.push(b.innerText)); return a;
 }
 
-// ------------------------------ 发布
 function postClass(){saveBuddy("课友",getClassData(),false);}
 function postClassPublic(){saveBuddy("课友",getClassData(),true);}
 function postSport(){saveBuddy("运动搭子",getSportData(),false);}
@@ -478,7 +474,6 @@ function postMealPublic(){saveBuddy("饭搭子",getMealData(),true);}
 function postGame(){saveBuddy("游戏搭子",getGameData(),false);}
 function postGamePublic(){saveBuddy("游戏搭子",getGameData(),true);}
 
-// 租房发布
 function postRent(){
     const d = {
         gender: document.getElementById('r_gender').value,
@@ -532,7 +527,6 @@ async function saveBuddy(type,data,isPublic){
     openTab(7);
 }
 
-// ------------------------------ 公开广场
 async function loadPublicSquare(){
     const { data } = await supabaseClient
         .from("posts").select("*").eq("is_public",true).order("created_at",{ascending:false});
@@ -555,7 +549,7 @@ async function renderPublicHtml(list){
         const old = new Date(p.created_at).getTime() < now-THREE_MONTH;
         h+=`
         <div class="public-card ${old?'old-msg-wrap':''}">
-            <div class="avatar" style="${getAvatarColor(p.type)}">匿</div>
+            <div class="avatar" style="background:${getAvatarColor(p.type)}">匿</div>
             <div class="public-info">
                 <b>${p.type}</b><br>
                 标签：${p.tag||'无'}<br>
@@ -572,7 +566,6 @@ async function renderPublicHtml(list){
     document.getElementById('publicSquare').innerHTML=h;
 }
 
-// ------------------------------ 我的发布 + 删除按钮
 async function showMyAndMatch(){
     const { data } = await supabaseClient
         .from("posts").select("*").eq("user_id",userId).order("created_at",{ascending:false});
@@ -604,7 +597,6 @@ async function deletePost(pid){
     showMyAndMatch();
 }
 
-// ------------------------------ 留言板
 async function postMsg(){
     const v=document.getElementById('msgInput').value.trim();
     if(!v)return;
