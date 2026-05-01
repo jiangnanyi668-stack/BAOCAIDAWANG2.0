@@ -258,7 +258,7 @@
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
     <textarea id="c_public" placeholder="公开备注"></textarea>
-    <textarea id="c_private" placeholder="私密联系方式"></textarea>
+    <textarea id="c_private" placeholder="私密联系方式（必填）"></textarea>
     <button onclick="postClass()">发布</button>
 </div>
 
@@ -276,14 +276,15 @@
     </select>
     <input type="text" id="r_date" placeholder="入住日期/备注（选填）">
     <textarea id="r_public" placeholder="公开可见：租房要求/位置/租期"></textarea>
-    <textarea id="r_private" placeholder="私密联系方式"></textarea>
+    <textarea id="r_private" placeholder="私密联系方式（必填）"></textarea>
     <button onclick="postRent()">发布</button>
 </div>
 
 <div class="page" id="page2">
     <h3>发布运动搭子</h3>
     <select id="s_type">
-        <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option><option>其他</option>
+        <option>篮球</option><option>羽毛球</option><option>健身</option><option>网球</option><option>跑步</option>
+        <option>足球</option><option>乒乓球</option><option>其他</option>
     </select>
     <input type="text" id="s_date" placeholder="日期（选填）">
     <select id="s_week">
@@ -297,7 +298,7 @@
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
     <textarea id="s_public" placeholder="公开备注"></textarea>
-    <textarea id="s_private" placeholder="私密联系方式"></textarea>
+    <textarea id="s_private" placeholder="私密联系方式（必填）"></textarea>
     <button onclick="postSport()">发布</button>
 </div>
 
@@ -318,7 +319,7 @@
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
     <textarea id="f_public" placeholder="口味/需求"></textarea>
-    <textarea id="f_private" placeholder="私密联系方式"></textarea>
+    <textarea id="f_private" placeholder="私密联系方式（必填）"></textarea>
     <button onclick="postMeal()">发布</button>
 </div>
 
@@ -327,6 +328,7 @@
     <select id="g_type">
         <option>LOL</option><option>Valorant</option><option>APEX</option><option>PUBG</option><option>原神</option><option>CS2</option>
         <option>Minecraft</option><option>王者荣耀</option><option>第五人格</option><option>洛克王国</option><option>和平精英</option><option>永劫无间</option>
+        <option>守望先锋</option><option>其他</option>
     </select>
     <input type="text" id="g_date" placeholder="日期（选填）">
     <select id="g_week">
@@ -340,7 +342,7 @@
         <button class="time-btn" onclick="selTime(this)">19:00-22:00</button>
     </div>
     <textarea id="g_public" placeholder="组队要求"></textarea>
-    <textarea id="g_private" placeholder="私密联系方式"></textarea>
+    <textarea id="g_private" placeholder="私密联系方式（必填）"></textarea>
     <button onclick="postGame()">发布</button>
 </div>
 
@@ -432,52 +434,72 @@ function getTimes(w){
 }
 
 function postClass(){
+    const code = document.getElementById('c_code').value.trim();
+    const name = document.getElementById('c_name').value.trim();
+    const pri = document.getElementById('c_private').value.trim();
+    if(!pri) return alert("请填写私密联系方式！");
+    
     const d = {
-        code:document.getElementById('c_code').value, name:document.getElementById('c_name').value,
+        code:code, name:name,
         date:document.getElementById('c_date').value, week:document.getElementById('c_week').value,
-        times:getTimes("#page0"), pubTxt:document.getElementById('c_public').value, priTxt:document.getElementById('c_private').value
+        times:getTimes("#page0"), pubTxt:document.getElementById('c_public').value, priTxt:pri
     };
     saveBuddy("课友", d);
 }
 function postSport(){
+    const pri = document.getElementById('s_private').value.trim();
+    if(!pri) return alert("请填写私密联系方式！");
     const d = {
         type:document.getElementById('s_type').value, date:document.getElementById('s_date').value,
         week:document.getElementById('s_week').value, times:getTimes("#page2"),
-        pubTxt:document.getElementById('s_public').value, priTxt:document.getElementById('s_private').value
+        pubTxt:document.getElementById('s_public').value, priTxt:pri
     };
     saveBuddy("运动搭子", d);
 }
 function postMeal(){
+    const pri = document.getElementById('f_private').value.trim();
+    if(!pri) return alert("请填写私密联系方式！");
     const d = {
         type:document.getElementById('f_type').value, date:document.getElementById('f_date').value,
         week:document.getElementById('f_week').value, times:getTimes("#page3"),
-        pubTxt:document.getElementById('f_public').value, priTxt:document.getElementById('f_private').value
+        pubTxt:document.getElementById('f_public').value, priTxt:pri
     };
     saveBuddy("饭搭子", d);
 }
 function postGame(){
+    const pri = document.getElementById('g_private').value.trim();
+    if(!pri) return alert("请填写私密联系方式！");
     const d = {
         type:document.getElementById('g_type').value, date:document.getElementById('g_date').value,
         week:document.getElementById('g_week').value, times:getTimes("#page4"),
-        pubTxt:document.getElementById('g_public').value, priTxt:document.getElementById('g_private').value
+        pubTxt:document.getElementById('g_public').value, priTxt:pri
     };
     saveBuddy("游戏搭子", d);
 }
 function postRent(){
+    const pri = document.getElementById('r_private').value.trim();
+    if(!pri) return alert("请填写私密联系方式！");
     const d = {
         gender: document.getElementById('r_gender').value,
         grade: document.getElementById('r_grade').value,
         house: document.getElementById('r_house').value,
         date: document.getElementById('r_date').value,
         pubTxt: document.getElementById('r_public').value,
-        priTxt: document.getElementById('r_private').value
+        priTxt: pri
     };
     saveBuddy("租房", d);
 }
 
 async function saveBuddy(type,data){
+    let tag = "";
+    if(type === "课友"){
+        tag = `${data.code || ""} ${data.name || ""}`.trim();
+    } else {
+        tag = data.type || data.gender || "";
+    }
+
     const po = {
-        user_id:userId, type:type, tag: data.type || data.gender || "",
+        user_id:userId, type:type, tag: tag,
         week:data.week||"", times:data.times||[], date:data.date||"",
         pub_txt:data.pubTxt||"", pri_txt:data.priTxt||"", is_public:true
     };
@@ -542,11 +564,22 @@ async function isMutualMatch(postOwnerId, postId){
 }
 
 async function loadPublicSquare(){
-    const { data } = await supabaseClient
-        .from("posts").select("*").eq("is_public",true).order("created_at",{ascending:false});
+    let query = supabaseClient.from("posts").select("*").eq("is_public",true);
+
+    const typeVal = document.getElementById("filterType").value;
+    const timeVal = document.getElementById("filterTime").value;
+    
+    if(typeVal) query = query.eq("type", typeVal);
+    if(timeVal) query = query.contains("times", [timeVal]);
+
+    const { data } = await query.order("created_at",{ascending:false});
     renderPublicHtml(data||[]);
 }
-function filterPublicPost(){loadPublicSquare();}
+
+function filterPublicPost(){
+    loadPublicSquare();
+}
+
 function resetFilter(){
     document.getElementById('filterType').value="";
     document.getElementById('filterTime').value="";
